@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <template th:include="admin/common/header_statics :: header('登录')" th:remove="tag"></template>
+    <link rel="stylesheet" th:href="@{/static/css/admin.css}"/>
+</head>
+<body class="hold-transition login-page">
+<div class="login-box" v-cloak>
+    <div class="login-logo">
+        <a href="#">会员管理系统</a>
+    </div>
+    <!-- /.login-logo -->
+    <div class="login-box-body">
+        <p class="login-box-msg" :class="error?'animation-shake error':''">{{msg}}</p>
+        <validator @mounted="validatorMounted">
+            <form method="post" @submit.prevent="submitForm">
+                <div class="form-group has-feedback">
+                    <input class="form-control" placeholder="Username" v-focus v-model="username" @keydown.enter="submitForm" required>
+                    <span class="fa fa-user form-control-feedback"></span>
+                </div>
+                <div class="form-group has-feedback">
+                    <input type="password" class="form-control" placeholder="Password" @keydown.enter="submitForm" v-model="password" required>
+                    <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+                </div>
+                <div class="row">
+                    <!-- /.col -->
+                    <div class="col-xs-12">
+                        <button type="submit" class="btn btn-primary btn-block btn-flat">登录</button>
+                    </div>
+                    <!-- /.col -->
+                </div>
+            </form>
+        </validator>
+    </div>
+    <!-- /.login-box-body -->
+</div>
+
+<footer class="login-footer">
+    <a href="https://adminlte.io">备案号xxxxxxx</a>
+    <p>会员管理系统</p>
+    <script>
+        window._appConf = {
+            ctx: ''
+        };
+    </script>
+</footer>
+<!-- /.login-box -->
+<footer th:include="admin/common/footer_statics"></footer>
+<script th:src="@{/static/js/modules/login.js}"></script>
+</body>
+</html>

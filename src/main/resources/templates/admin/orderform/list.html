@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <template th:include="admin/common/header_statics :: header('销售列表')" th:remove="tag"></template>
+    <link rel="stylesheet" th:href="@{/static/css/admin.css}"/>
+</head>
+<body class="hold-transition skin-yellow sidebar-mini">
+<!--[if lte IE 9]>
+<p class="browsehappy">你正在使用<strong>过时</strong>的浏览器，奎爷 暂不支持。 请 <a href="http://browsehappy.com/" target="_blank">升级浏览器</a>
+    以获得更好的体验！</p>
+<![endif]-->
+<!-- Site wrapper -->
+<div class="wrapper">
+    <header th:include="admin/common/header_html"></header>
+    <!-- =============================================== -->
+    <aside th:include="admin/common/aside"></aside>
+    <!-- =============================================== -->
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper order-form">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <h1>
+                销售列表
+                <small>订单发货 退换货等操作</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li>订单管理</li>
+                <li class="active">销售列表</li>
+            </ol>
+        </section>
+
+        <!-- Main content -->
+        <section id="content" class="content" v-cloak>
+            <div class="box">
+                <div class="box-header">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <input type="text" placeholder="订单号" v-model="queryParams.orderNumber" class="form-control">
+                        </div>
+                        <div class="col-md-2">
+                            <combobox :options="orderStatus" text-key="text" v-model="queryParams.status" :root="{id:null, text:'订单状态'}"></combobox>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="radio">
+                                <label>
+                                    <radio :value="1" name="createdDate" v-model="queryParams.createdDateRadio"></radio> 今天
+                                </label>
+                                <label>
+                                    <radio :value="2" name="createdDate" v-model="queryParams.createdDateRadio"></radio> 最近7天
+                                </label>
+                                <label>
+                                    <radio :value="3" name="createdDate" v-model="queryParams.createdDateRadio"></radio> 最近30天
+                                </label>
+                                <label>
+                                    <radio :value="0" name="createdDate" v-model="queryParams.createdDateRadio"></radio> 全部
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-flat btn-primary pull-right" @click="load">
+                                <i class="fa fa-search"></i>
+                                搜索
+                            </button>
+                            <button type="button" class="btn btn-flat btn-info pull-right margin-r-5"
+                                    @click="queryParams={createdDate: [new Date(new Date().format('yyyy-MM-dd')).getTime(), new Date().getTime()],status:null,createdDateRadio: 1}">
+                                <i class="fa fa-trash"></i>
+                                清空
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="dataTables_wrapper">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table role="grid" aria-describedby="example2_info"
+                                       class="table table-bordered table-hover dataTable">
+                                    <thead class="table-header">
+                                    <tr>
+                                        <th style="text-align: center; width: 40px;"><checkbox :value="checkAll" v-model="checkAll" @change="selectAll"></checkbox></th>
+                                        <th>商品名称</th>
+                                        <th>销售金额</th>
+                                        <th>数量</th>
+                                        <th>单号</th>
+                                        <th style="text-align: center; width: 40px;">状态</th>
+                                        <th>创建日期</th>
+                                        <th style="text-align: center; width: 100px;">操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <template v-for="row in data">
+                                    <tr>
+                                        <td style="text-align: center;"><checkbox :value="row" v-model="selectedRows"></checkbox></td>
+                                        <td style="cursor: pointer" @click="expend(row)">
+                                            <div class="col-xs-4 cell-title">商品名称：</div>
+                                            <b>本次消费数据合计：</b>
+                                            <i :class="row.expended?'fa fa-angle-double-down':'fa fa-angle-double-up'"></i>
+                                        </td>
+                                        <td>
+                                            <div class="col-xs-4 cell-title">销售金额：</div>
+                                            {{row.cash | price}}
+                                        </td>
+                                        <td>
+                                            <div class="col-xs-4 cell-title">数量：</div>
+                                            {{getProductTotal(row)}}
+                                        </td>
+                                        <td>
+                                            <div class="col-xs-4 cell-title">单号：</div>
+                                            {{row.orderNumber}}
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <div class="col-xs-4 cell-title">状态：</div>
+                                            <span class="label margin-r-5"
+                                                  :class="getStatusClass(row.status)">{{row.status| status}}</span>
+                                        </td>
+                                        <td>
+                                            <div class="col-xs-4 cell-title">创建日期：</div>
+                                            {{row.createdDate | date}}
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <div class="col-xs-4 cell-title">操作：</div>
+                                            <a class="btn btn-xs bg-purple" title="查看" @click="detailModalOpen(row)"><i class="fa fa-fw fa-eye"></i></a>
+                                            <a v-if="row.status == 'PAYED'"
+                                               class="btn btn-xs bg-green"
+                                               title="发货"
+                                               @click="shipModalOpen(row)"><i class="fa fa-bus"></i></a>
+                                            <a v-if="row.status == 'APPLY_REJECTED'"
+                                               class="btn btn-xs bg-red"
+                                               title="退换货"
+                                               @click="rejectModalOpen(row)"><i class="fa fa-reply"></i></a>
+                                        </td>
+                                    </tr>
+                                    <tr v-for="sub in row.items" v-if="row.expended">
+                                        <td style="text-align: center; width: 40px;"></td>
+                                        <td>
+                                            <div class="col-xs-4 cell-title">商品名称：</div>
+                                            <div class="pull-left margin-r-5">
+                                                <img class="img-thumbnail"
+                                                     :alt="sub.product.name"
+                                                     :src="sub.product.coverImage.id | coverPath"
+                                                     width="50"
+                                                     height="50">
+                                            </div>
+                                            <div class="pull-left">
+                                                <p>{{sub.product.name}}</p>
+                                                <span style="color: #999">-{{sub.product.productCategory.name}}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="col-xs-4 cell-title">销售金额：</div>
+                                            {{sub.product.price | price}}
+                                        </td>
+                                        <td>
+                                            <div class="col-xs-4 cell-title">数量：</div>
+                                            x {{sub.count}}
+                                        </td>
+                                        <td class="hidden-xs"></td>
+                                        <td class="hidden-xs"></td>
+                                        <td class="hidden-xs"></td>
+                                        <td class="hidden-xs"></td>
+                                    </tr>
+                                    </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <pagination :current-page="currentPage" :pager-size="pagerSize" :page-size="pageSize" :count="count" @go="goToPage"></pagination>
+                    </div>
+                </div>
+            </div>
+
+            <validator :instance="shippingInfo.validator">
+                <form @submit.prevent="shippingInfoSave">
+                    <modal title="发货信息维护" :footer="true" :instance="shippingInfo.modal">
+                        <template slot="body">
+                            <div class="form-group">
+                                <label>运单号：</label>
+                                <input type="text" class="form-control" required v-model="shippingInfo.form.shippingCode" placeholder="输入运单号">
+                            </div>
+                            <div class="form-group">
+                                <label>发货日期：</label>
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <datepicker required v-model="shippingInfo.form.shippingDate"></datepicker>
+                                </div>
+                            </div>
+                        </template>
+                        <template slot="footer">
+                            <button type="button" class="btn btn-default margin-r-5 btn-flat" @click="shippingInfo.modal.$instance.close()">取消发货</button>
+                            <button type="submit" class="btn btn-primary btn-flat">确认发货</button>
+                        </template>
+                    </modal>
+                </form>
+            </validator>
+
+            <validator :instance="returnMoney.validator">
+                <form @submit.prevent="returnMoneySave">
+                    <modal title="退换货" :footer="true" :instance="returnMoney.modal">
+                        <template slot="body">
+                            <div class="form-group">
+                                <label>退回金额（如果换货则为 0）：</label>
+                                <input type="number" class="form-control" required v-model="returnMoney.form.returnedMoney" placeholder="输入退款金额">
+                            </div>
+                            <div class="form-group">
+                                <label>退回余额（如果换货则为 0）：</label>
+                                <input type="number" class="form-control" required v-model="returnMoney.form.returnedBalance" placeholder="输入退回余额">
+                            </div>
+                            <div class="form-group">
+                                <label>退回积分（如果换货则为 0）：</label>
+                                <input type="number" class="form-control" required v-model="returnMoney.form.returnedPoint" placeholder="输入退回积分">
+                            </div>
+                            <div class="form-group">
+                                <label>备注：</label>
+                                <textarea class="form-control" rows="3" required v-model="returnMoney.form.returnedRemark" placeholder="输入备注"></textarea>
+                            </div>
+                        </template>
+                        <template slot="footer">
+                            <button type="button" class="btn btn-default margin-r-5 btn-flat" @click="returnMoney.modal.$instance.close()">取消退款</button>
+                            <button type="submit" class="btn btn-primary btn-flat">确认退款</button>
+                        </template>
+                    </modal>
+                </form>
+            </validator>
+
+            <sidemodal :title="'订单详情 | 单号：' + formDetail.form.orderNumber" :footer="true" :instance="formDetail.modal">
+                <template slot="body">
+                    <div class="member-address">
+                        <div class="row">
+                            <div class="col-xs-1">
+                                <i class="fa fa-fw fa-map-marker location"></i>
+                            </div>
+                            <div class="col-xs-11">
+                                <div class="row">
+                                    <p class="col-xs-9">
+                                        收货人：{{formDetail.form.deliverToAddress.name}}
+                                    </p>
+                                    <p class="col-xs-3">
+                                        {{formDetail.form.deliverToAddress.tel}}
+                                    </p>
+                                </div>
+                                <div class="row">
+                                    <p class="col-xs-12">
+                                        详细地址：{{formDetail.form.deliverToAddress.address | addressName}}
+                                        {{formDetail.form.deliverToAddress.detailAddress}}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="order-accounts">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <p>应收</p>
+                                {{getReceivable(formDetail.form) | price}}
+                            </div>
+                            <div class="col-xs-3">
+                                <p>现金</p>
+                                {{formDetail.form.cash | price}}
+                            </div>
+                            <div class="col-xs-3">
+                                <p>储值</p>
+                                {{formDetail.form.balance | price}}
+                            </div>
+                            <div class="col-xs-3">
+                                <p>积分</p>
+                                {{formDetail.form.point}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>状态：</label>
+                        <input type="text" class="form-control" :value="formDetail.form.status | status" placeholder="-">
+                    </div>
+                    <div class="form-group">
+                        <label>赠送积分：</label>
+                        <input type="text" class="form-control" :value="getProductPoint(formDetail.form)" placeholder="-">
+                    </div>
+                    <div class="form-group">
+                        <label>邮政编码：</label>
+                        <input type="text" class="form-control" :value="formDetail.form.deliverToAddress.postalCode" placeholder="-">
+                    </div>
+                    <div class="form-group">
+                        <label>买家名称：</label>
+                        <input type="text" class="form-control" :value="formDetail.form.member.name" placeholder="-">
+                    </div>
+                    <div class="form-group">
+                        <label>买家留言：</label>
+                        <input type="text" class="form-control" :value="formDetail.form.remark" placeholder="-">
+                    </div>
+                    <div class="form-group">
+                        <label>运单号：</label>
+                        <input type="text" class="form-control" :value="formDetail.form.shippingCode" placeholder="-">
+                    </div>
+                    <div class="form-group">
+                        <label>发货日期：</label>
+                        <input type="text" class="form-control" :value="formDetail.form.shippingDate | date" placeholder="-">
+                    </div>
+                    <div class="form-group" v-if="formDetail.form.status == 'APPLY_REJECTED'">
+                        <label>申请退款备注：</label>
+                        <input type="text" class="form-control" :value="formDetail.form.applyRejectRemark" placeholder="-">
+                    </div>
+                    <div class="form-group" v-if="formDetail.form.status == 'REJECTED'">
+                        <label>退回金额：</label>
+                        <input type="text" class="form-control" :value="formDetail.form.returnedMoney | price" placeholder="-">
+                    </div>
+                    <div class="form-group" v-if="formDetail.form.status == 'REJECTED'">
+                        <label>退回余额：</label>
+                        <input type="text" class="form-control" :value="formDetail.form.returnedBalance | price" placeholder="-">
+                    </div>
+                    <div class="form-group" v-if="formDetail.form.status == 'REJECTED'">
+                        <label>退回积分：</label>
+                        <input type="text" class="form-control" :value="formDetail.form.returnedPoint" placeholder="-">
+                    </div>
+                    <div class="form-group" v-if="formDetail.form.status == 'REJECTED'">
+                        <label>退款备注：</label>
+                        <input type="text" class="form-control" :value="formDetail.form.returnedRemark" placeholder="-">
+                    </div>
+                    <div class="form-group">
+                        <label>创建日期：</label>
+                        <input type="text" class="form-control" :value="formDetail.form.createdDate | date" placeholder="-">
+                    </div>
+                    <div class="form-group" v-if="formDetail.form.status == 'RECEIVED'">
+                        <label>结单日期：</label>
+                        <input type="text" class="form-control" :value="formDetail.form.finishedDate | date" placeholder="-">
+                    </div>
+                </template>
+                <template slot="footer">
+                    <button type="button" class="btn btn-default margin-r-5 btn-flat" @click="formDetail.modal.$instance.close()">关闭窗口</button>
+                    <button type="button" v-if="formDetail.form.status == 'PAYED'"
+                       class="btn btn-flat btn-success margin-r-5"
+                       @click="shipModalOpen(formDetail.form)"><i class="fa fa-bus"></i> 发货</button>
+                    <button type="button" v-if="formDetail.form.status == 'APPLY_REJECTED'"
+                       class="btn btn-flat btn-danger"
+                       @click="rejectModalOpen(formDetail.form)"><i class="fa fa-reply"></i> 退换货</button>
+                </template>
+            </sidemodal>
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <footer th:include="admin/common/footer_html"></footer>
+</div>
+<!-- ./wrapper -->
+<footer th:include="admin/common/footer_statics"></footer>
+<script th:src="@{/static/js/modules/orderform/list.js}"></script>
+</body>
+</html>

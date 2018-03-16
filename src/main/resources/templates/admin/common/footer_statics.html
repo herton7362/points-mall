@@ -1,0 +1,120 @@
+<footer xmlns:th="http://www.thymeleaf.org">
+    <script th:inline="javascript">
+        window._appConf = window._appConf || {};
+        window._appConf = {
+            version: '1.0.0',
+            ctx: window._appConf.ctx || '',
+            loginUrl: window._appConf.loginUrl || '/admin/login',
+            appId: window._appConf.appId || 'tonr',
+            appSecret: window._appConf.appSecret || 'secret'
+        };
+    </script>
+    <script th:src="@{/webjars/require.js}"></script>
+    <script th:src="@{/webjars/plugins/admin/main.js}"></script>
+    <script>
+        requirejs.config({
+            urlArgs: "v=" + window._appConf.version,
+            baseUrl: (window._appConf.ctx || '') + '/webjars/plugins/admin/',
+            waitSeconds: 0,
+            paths: {
+                'base-jquery': '../jquery/js/jquery-2.1.4.min',
+                'jquery': 'jquery/jquery',
+                'bootstrap': '../bootstrap/js/bootstrap.min',
+                'base-datepicker': '../datepicker/js/bootstrap-datepicker.min',
+                'datepicker-cn': '../datepicker/locales/bootstrap-datepicker.zh-CN.min',
+                'datepicker': 'datepicker/datepicker',
+                'base-adminlte': '../AdminLTE/js/adminlte.min',
+                'adminlte': '../AdminLTE/adminlte',
+                'base-vue': '../vue/js/vue.min',
+                'vue':'vue/vue',
+                'sortablejs': '../vue/js/Sortable.min',
+                'vuedraggable': '../vue/js/vuedraggable',
+                'utils': 'utils/utils',
+                'app': '../utils/app',
+                'validator': '../validator/validator',
+                'messager': 'messager/js/messager',
+                'datagrid': 'datagrid/datagrid',
+                'datagrid-cell': 'datagrid/datagridCell',
+                'pagination': 'pagination/pagination',
+                'sidebar': 'sidebar/js/sidebar',
+                'modal': 'modal/modal',
+                'crudgrid': 'view/crudgrid',
+                'treegrid': 'view/treegrid',
+                'icheck': '../iCheck/icheck.min',
+                'checkbox': 'checkbox/checkbox',
+                'radio': 'checkbox/radio',
+                'base-select2': '../select2/js/select2.full',
+                'combobox': 'combobox/combobox',
+                'combooption': 'combobox/combooption',
+                'jstree': '../jstree/jstree',
+                'tree': 'tree/tree',
+                'sidemodal': 'sidemodal/sidemodal',
+                'uploader': 'uploader/uploader',
+                'raphael': '../raphael/raphael.min',
+                'morris': '../morris.js/morris'
+            },
+            shim: {
+                'vuedraggable':['sortablejs', 'base-vue'],
+                'jquery': ['base-jquery'],
+                'vue': [
+                    'base-vue',
+                    'vuedraggable',
+                    'pagination',
+                    'datagrid',
+                    'datagrid-cell',
+                    'pagination',
+                    'validator',
+                    'sidebar',
+                    'modal',
+                    'crudgrid',
+                    'treegrid',
+                    'datepicker',
+                    'checkbox',
+                    'combobox',
+                    'radio',
+                    'combooption',
+                    'tree',
+                    'sidemodal',
+                    'uploader'
+                ],
+                'messager': ['jquery', 'vue', 'css!../admin/messager/css/messager.css'],
+                'datagrid': ['css!../admin/datagrid/css/datagrid.css'],
+                'bootstrap': ['jquery'],
+                'base-datepicker': ['bootstrap'],
+                'datepicker-cn': ['base-datepicker', 'css!../datepicker/css/bootstrap-datepicker.css'],
+                'datepicker': ['jquery', 'datepicker-cn', 'utils'],
+                'base-adminlte': ['bootstrap'],
+                'adminlte': [
+                    'base-adminlte',
+                    'css!../AdminLTE/css/Ionicons/css/ionicons.min.css',
+                    'css!../AdminLTE/css/font-awesome/css/font-awesome.min.css',
+                    'css!../AdminLTE/css/datatables.net-bs/dataTables.bootstrap.min.css'
+                ],
+                'utils': ['app'],
+                'validator': ['jquery', 'app'],
+                'sidebar': ['jquery', 'utils', 'css!../admin/sidebar/css/sidebar.css'],
+                'pagination': ['jquery', 'css!../admin/pagination/css/pagination.css'],
+                'crudgrid': ['jquery', 'utils'],
+                'treegrid': ['jquery', 'utils'],
+                'icheck': ['bootstrap', 'css!../iCheck/all.css'],
+                'checkbox': ['jquery','icheck', 'utils'],
+                'radio': ['jquery','icheck', 'utils'],
+                'base-select2': ['bootstrap'],
+                'combobox': ['jquery', 'utils', 'base-select2'],
+                'combooption': [],
+                'modal': ['css!../admin/modal/css/modal.css'],
+                'jstree': ['css!../jstree/themes/default/style.min.css'],
+                'tree': ['jquery', 'jstree'],
+                'sidemodal': ['jquery', 'css!../admin/sidemodal/sidemodal.css'],
+                'uploader': ['jquery', 'utils', 'css!../admin/uploader/uploader.css'],
+                'morris': ['raphael', 'css!../morris.js/morris.css']
+            },
+            map: {
+                '*': {
+                    'css': (window._appConf.ctx || '') + '/webjars/plugins/css.min.js',
+                    'text': (window._appConf.ctx || '') + '/webjars/plugins/text.js'
+                }
+            }
+        });
+    </script>
+</footer>

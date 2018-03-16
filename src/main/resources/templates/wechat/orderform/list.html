@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <template th:include="wechat/common/header_statics :: header('蹄铁商城 - 下单')" th:remove="tag"></template>
+    <link rel="stylesheet" th:href="@{/static/css/wechat.css}"/>
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<body class="layout-top-nav skin-yellow h5-layout" style="height: auto; min-height: 100%;">
+<div id="content"  class="wrapper orderform-list product-list" style="height: auto; min-height: 100%;" v-cloak>
+
+    <!-- Full Width Column -->
+    <div class="content-wrapper">
+        <div class="container">
+            <!-- Main content -->
+            <section class="content">
+                <ul class="nav nav-tabs wechat-tabs" role="tablist" v-if="activeId != 'apply_rejected'">
+                    <li role="presentation" :class="{active: row.id === activeId}" @click="tabClick(row.id)" v-for="row in tabs">
+                        <a :href="'#' + row.id" :aria-controls="row.id" role="tab" data-toggle="tab">{{row.text}}</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="empty" v-if="orderForms.length <= 0 && !loading">
+                        <div class="empty-list-header">
+                            <h4>您还没有相关订单</h4> <span>快去看看有哪些想买的吧</span>
+                        </div>
+                        <div class="empty-list-content">
+                            <a th:href="@{/}" class="weui-btn weui-btn_plain-primary">去逛逛</a>
+                        </div>
+                    </div>
+                    <div class="weui-panel" v-for="orderForm in orderForms">
+                        <div class="weui-panel__hd">
+                            {{orderForm.updatedDate | date}}
+                            <span class="status">{{orderForm.status | status}}</span>
+                        </div>
+                        <div class="weui-panel__bd product-item" v-for="item in orderForm.items">
+                            <div class="weui-media-box weui-media-box_appmsg">
+                                <div class="weui-media-box__hd">
+                                    <img class="weui-media-box__thumb" :src="item.product.coverImage.id | coverPath" alt="item.product.name">
+                                </div>
+                                <div class="weui-media-box__bd">
+                                    <div class="row">
+                                        <div class="col-xs-8">
+                                            <p class="weui-media-box__title title">{{item.product.name}}</p>
+                                        </div>
+                                        <div class="col-xs-4">
+                                            <p class="weui-media-box__title num" style="text-align: right">x {{item.count}}</p>
+                                        </div>
+                                    </div>
+                                    <div class="space"></div>
+                                    <p class="weui-media-box__title price">￥ {{item.product.price | price}}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="weui-panel__ft">
+                            <div class="weui-cell weui-cell_link">
+                                <div class="weui-cell__bd"></div>
+                                <div class="weui-cell__ft">
+                                    共 {{getAmount(orderForm.items)}} 件商品 合计 <span class="total-price">￥{{getTotal(orderForm.items) | price}}</span>
+                                    <p class="operators">
+                                        <button type="button"
+                                                class="weui-btn weui-btn_mini weui-btn_primary"
+                                                style="margin-right: 5px; line-height: 26px;"
+                                                v-if="orderForm.status == 'UN_PAY'"
+                                                @click="pay(orderForm)">去支付</button>
+                                        <button type="button"
+                                                class="weui-btn weui-btn_mini weui-btn_primary"
+                                                style="margin-right: 5px; line-height: 26px;"
+                                                v-if="orderForm.status == 'DELIVERED'"
+                                                @click="receive(orderForm)">确认收货</button>
+                                        <button type="button"
+                                                class="weui-btn weui-btn_mini weui-btn_warn"
+                                                style="margin-right: 5px; line-height: 26px;"
+                                                v-if="orderForm.status == 'PAYED' || orderForm.status == 'DELIVERED' || orderForm.status == 'RECEIVED'"
+                                                @click="applyReject(orderForm)">申请退货</button>
+                                        <button type="button"
+                                                class="weui-btn weui-btn_mini weui-btn_plain-default"
+                                                @click="orderFormDetail(orderForm)">查看订单</button>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.container -->
+    </div>
+    <aside th:replace="wechat/common/aside"></aside>
+    <!-- /.content-wrapper -->
+</div>
+<!-- ./wrapper -->
+<footer th:replace="wechat/common/footer_statics"></footer>
+<script th:src="@{/static/js/wechat/orderform/list.js}"></script>
+</body>
+</html>

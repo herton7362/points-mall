@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <template th:include="wechat/common/header_statics :: header('蹄铁商城 - 下单')" th:remove="tag"></template>
+    <link rel="stylesheet" th:href="@{/static/css/wechat.css}"/>
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<body class="layout-top-nav skin-yellow h5-layout" style="height: auto; min-height: 100%;">
+<div id="content"  class="wrapper coupon-list" style="height: auto; min-height: 100%;" v-cloak>
+
+    <!-- Full Width Column -->
+    <div class="content-wrapper">
+        <div class="container">
+            <!-- Main content -->
+            <section class="content">
+                <ul class="nav nav-tabs wechat-tabs" role="tablist">
+                    <li role="presentation" class="active">
+                        <a href="#all" aria-controls="all" role="tab" data-toggle="tab">全部</a>
+                    </li>
+                    <li role="presentation">
+                        <a href="#my" aria-controls="my" role="tab" data-toggle="tab">我的</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane fade active in" id="all" aria-labelledby="home-tab">
+                        <div class="empty" v-if="coupons.length <= 0">
+                            <div class="empty-list-header">
+                                <h4>暂时没有优惠券</h4> <span>再等等吧</span>
+                            </div>
+                            <div class="empty-list-content">
+                                <a th:href="@{/}" class="weui-btn weui-btn_plain-primary">去逛逛</a>
+                            </div>
+                        </div>
+                        <div class="coupon-card" :class="{expired: coupon.expired}" v-for="coupon in coupons">
+                            <div class="coupon-body" >
+                                <div class="price" v-html="priceFormatter(coupon.amount)">
+                                </div>
+                                <div class="description">
+                                    <div class="title">
+                                        {{coupon.name}}
+                                    </div>
+                                    每单达到{{coupon.minAmount | price}}元可使用
+                                </div>
+                                <div class="status">
+                                    <i class="iconfont icon-expired" v-if="coupon.expired"></i>
+                                    <span v-if="!coupon.expired">立即领取</span>
+                                    <a href="javascript:void(0)"
+                                       class="weui-btn weui-btn_plain-default btn-claim"
+                                       v-if="!coupon.expired"
+                                       @click="claim(coupon)">领取</a>
+                                </div>
+                                <div class="left-circle"></div>
+                                <div class="right-circle"></div>
+                            </div>
+                            <div class="coupon-footer">
+                                有效期： {{coupon.startDate | date}} 至 {{coupon.endDate | date}}
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane fade" id="my" aria-labelledby="home-tab">
+                        <div class="empty" v-if="!member.coupons || member.coupons.length <= 0">
+                            <div class="empty-list-header">
+                                <h4>暂时没有优惠券</h4> <span>快去领取</span>
+                            </div>
+                            <div class="empty-list-content">
+                                <a th:href="@{/wechat/coupon/list}" class="weui-btn weui-btn_plain-primary">去领取</a>
+                            </div>
+                        </div>
+                        <div class="coupon-card" :class="{expired: coupon.expired || coupon.used}" v-for="coupon in member.coupons">
+                            <div class="coupon-body" >
+                                <div class="price" v-html="priceFormatter(coupon.coupon.amount)">
+                                </div>
+                                <div class="description">
+                                    <div class="title">
+                                        {{coupon.coupon.name}}
+                                    </div>
+                                    每单达到{{coupon.coupon.minAmount | price}}元可使用
+                                </div>
+                                <div class="status">
+                                    <i class="iconfont icon-expired" v-if="coupon.expired && !coupon.used"></i>
+                                    <i class="iconfont icon-used" v-if="coupon.used"></i>
+                                    <span v-if="!coupon.expired && !coupon.used">立即使用</span>
+                                    <a th:href="@{/}" class="weui-btn weui-btn_plain-primary" v-if="!coupon.expired && !coupon.used">去逛逛</a>
+                                </div>
+                                <div class="left-circle"></div>
+                                <div class="right-circle"></div>
+                            </div>
+                            <div class="coupon-footer">
+                                有效期： {{coupon.coupon.startDate | date}} 至 {{coupon.coupon.endDate | date}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.container -->
+    </div>
+    <aside th:replace="wechat/common/aside"></aside>
+    <!-- /.content-wrapper -->
+</div>
+<!-- ./wrapper -->
+<footer th:replace="wechat/common/footer_statics"></footer>
+<script th:src="@{/static/js/wechat/coupon/list.js}"></script>
+</body>
+</html>

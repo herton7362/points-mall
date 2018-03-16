@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <template th:include="wechat/common/header_statics :: header('蹄铁商城 - 订单详情')" th:remove="tag"></template>
+    <link rel="stylesheet" th:href="@{/static/css/wechat.css}"/>
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<body class="layout-top-nav skin-yellow h5-layout" style="height: auto; min-height: 100%;">
+<div id="content"  class="wrapper orderform-new product-list" style="height: auto; min-height: 100%;" v-cloak>
+
+    <!-- Full Width Column -->
+    <div class="content-wrapper">
+        <div class="container">
+            <!-- Main content -->
+            <section class="content">
+                <div class="weui-cells member-address">
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd">
+                            <p>
+                                <i class="iconfont icon-form"></i>
+                                订单状态：{{orderForm.status | status}}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="weui-media-box weui-media-box_appmsg member-address-item">
+                        <div class="weui-media-box__bd">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <p class="weui-media-box__title">
+                                        <i class="fa fa-fw fa-map-marker location"></i>
+                                        收货人：{{orderForm.deliverToAddress.name}}
+                                    </p>
+                                </div>
+                                <div class="col-xs-6">
+                                    <p class="weui-media-box__title" style="text-align: right">{{orderForm.deliverToAddress.tel}}</p>
+                                </div>
+                            </div>
+
+                            <p class="weui-media-box__desc">收货地址：{{orderForm.deliverToAddress.address | addressName}}{{orderForm.deliverToAddress.detailAddress}}</p>
+                        </div>
+                        <div class="weui-cell__ft"></div>
+                    </div>
+                </div>
+                <div class="weui-cells">
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd">
+                            <p>
+                                <i class="iconfont icon-store" style="font-size: 18px;"></i>
+                                蹄铁商城
+                            </p>
+                        </div>
+                    </div>
+                    <div class="weui-cell product-item" v-for="item in orderItems">
+                        <div class="weui-cell__bd">
+                            <div class="weui-media-box weui-media-box_appmsg">
+                                <div class="weui-media-box__hd">
+                                    <img class="weui-media-box__thumb" :src="item.product.coverImage.id | coverPath" alt="item.product.name">
+                                </div>
+                                <div class="weui-media-box__bd">
+                                    <div class="row">
+                                        <div class="col-xs-8">
+                                            <p class="weui-media-box__title">{{item.product.name}}</p>
+                                        </div>
+                                        <div class="col-xs-4">
+                                            <p class="weui-media-box__title">￥ {{item.product.price | price}}</p>
+                                        </div>
+                                    </div>
+
+                                    <p class="weui-media-box__title" style="text-align: right">x {{item.count}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd">
+                            <p>配送方式</p>
+                        </div>
+                        <div class="weui-cell__ft">
+                            <p>免运费</p>
+                            <p>普通快递</p>
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label class="weui-label">买家留言：</label></div>
+                        <div class="weui-cell__bd">
+                            <input class="weui-input" type="text" v-model="orderForm.remark" readonly placeholder="无">
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd">
+                            <p>合计</p>
+                        </div>
+                        <div class="weui-cell__bd" style="text-align: right">
+                            <p class="main-text-color">￥{{getTotal() | price}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="weui-cells">
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd">
+                            <p>商品金额</p>
+                        </div>
+                        <div class="weui-cell__bd" style="text-align: right">
+                            <p>￥{{getTotal() | price}}</p>
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd">
+                            <p>运费</p>
+                        </div>
+                        <div class="weui-cell__bd" style="text-align: right">
+                            <p> + ￥0.00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="weui-cells">
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd">
+                            <p>订单编号</p>
+                        </div>
+                        <div class="weui-cell__bd" style="text-align: right">
+                            <p>{{orderForm.orderNumber}}</p>
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd">
+                            <p>创建时间</p>
+                        </div>
+                        <div class="weui-cell__bd" style="text-align: right">
+                            <p> {{orderForm.createdDate | date}}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="weui-cells" v-if="orderForm.status == 'DELIVERED'">
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd">
+                            <p>运单号</p>
+                        </div>
+                        <div class="weui-cell__bd" style="text-align: right">
+                            <p>{{orderForm.shippingCode}}</p>
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd">
+                            <p>发货时间</p>
+                        </div>
+                        <div class="weui-cell__bd" style="text-align: right">
+                            <p> {{orderForm.shippingDate | date}}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="weui-cells">
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd">
+                            <p>优惠券</p>
+                        </div>
+                        <div class="weui-cell__ft">
+                            <template v-if="orderForm.coupon && orderForm.coupon.amount">
+                                - ￥{{orderForm.coupon.amount | price}}
+                            </template>
+                            <template v-if="!orderForm.coupon || !orderForm.coupon.amount">
+                                无
+                            </template>
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd">
+                            <p>
+                                积分抵扣
+                            </p>
+                        </div>
+                        <div class="weui-cell__ft">
+                            <template v-if="orderForm.point">
+                                - ￥{{orderForm.point/100}}（{{orderForm.point}}）
+                            </template>
+                            <template v-if="!orderForm.point">
+                                无
+                            </template>
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd">
+                            <p>
+                                余额支付
+                            </p>
+                        </div>
+                        <div class="weui-cell__ft">
+                            <template v-if="orderForm.balance">
+                                - ￥{{orderForm.balance}}
+                            </template>
+                            <template v-if="!orderForm.balance">
+                                无
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.container -->
+    </div>
+    <aside th:replace="wechat/common/aside"></aside>
+    <!-- /.content-wrapper -->
+</div>
+<!-- ./wrapper -->
+<footer th:replace="wechat/common/footer_statics"></footer>
+<script th:src="@{/static/js/wechat/orderform/detail.js}"></script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <template th:include="wechat/common/header_statics :: header('蹄铁商城 - 购物车')" th:remove="tag"></template>
+    <link rel="stylesheet" th:href="@{/static/css/wechat.css}"/>
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<body class="layout-top-nav skin-yellow h5-layout" style="height: auto; min-height: 100%;">
+<div id="content"  class="wrapper product-list cart-list" style="height: auto; min-height: 100%;" v-cloak>
+
+    <!-- Full Width Column -->
+    <div class="content-wrapper">
+        <div class="container">
+            <!-- Main content -->
+            <section class="content">
+                <div class="empty" v-if="cartItems.length <= 0 && !loading">
+                    <div class="empty-list-header">
+                        <h4>购物车快饿瘪了 T.T</h4> <span>快给我挑点宝贝</span>
+                    </div>
+                    <div class="empty-list-content">
+                        <a th:href="@{/}" class="weui-btn weui-btn_plain-primary">去逛逛</a>
+                    </div>
+                </div>
+                <div class="weui-cells weui-cells_checkbox" v-if="cartItems.length > 0" style="margin-top: 0">
+                    <label class="weui-cell weui-check__label store-name" @click="checkAll">
+                        <div class="weui-cell__hd">
+                            <input type="checkbox" class="weui-check" v-model="checkedAll">
+                            <i class="weui-icon-checked"></i>
+                        </div>
+                        <div class="weui-cell__bd">
+                            <p>
+                                <i class="iconfont icon-store" style="font-size: 18px;"></i>
+                                蹄铁商城
+                            </p>
+                        </div>
+                        <div class="weui-cell__ft" @click="edit">
+                            <a href="javascript:void(0)">{{editing?'完成':'编辑'}}</a>
+                        </div>
+                    </label>
+                    <div class="weui-cell product-item weui-check__label" :class="{'weui-cell_swiped':editing}" v-for="item in cartItems">
+                        <label class="weui-cell__hd" @click="selectItem">
+                            <input type="checkbox" class="weui-check" name="dj" v-model="selectedItems" :value="item" checked="checked">
+                            <i class="weui-icon-checked"></i>
+                        </label>
+                        <div class="weui-cell__bd">
+                            <div class="weui-media-box weui-media-box_appmsg">
+                                <div class="weui-media-box__hd" @click="productDetail(item.product)">
+                                    <img class="weui-media-box__thumb" :src="item.product.coverImage.id | coverPath" alt="item.product.name">
+                                </div>
+                                <div class="weui-media-box__bd">
+                                    <p class="weui-media-box__title title" v-if="!editing">
+                                        {{item.product.name}}
+                                    </p>
+                                    <div class="weui-media-box__title title" v-if="editing">
+                                        <div class="input-group input-group-sm number">
+                                            <div class="input-group-addon">
+                                                <button class="btn btn-sm btn-block btn-flat"
+                                                        :class="{disabled: item.count <= 1}"
+                                                        :disabled="item.count <= 1"
+                                                        @click="reduce(item)"> - </button>
+                                            </div>
+                                            <input type="text" pattern="[0-9]*" v-model="item.count" class="form-control">
+                                            <div class="input-group-addon">
+                                                <button class="btn btn-sm btn-block btn-flat" @click="increase(item)"> + </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="space"></div>
+                                    <div class="row">
+                                        <div class="col-xs-8">
+                                            <p class="weui-media-box__title price">￥ {{item.product.price | price}}</p>
+                                        </div>
+                                        <div class="col-xs-4" v-if="!editing">
+                                            <p class="weui-media-box__title num" style="text-align: right">x {{item.count}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="weui-cell__ft delete" v-if="editing" @click="remove(item)">
+                            <a class="weui-swiped-btn weui-swiped-btn_warn" href="javascript:">删除</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.container -->
+    </div>
+    <div class="row tabbar" v-if="cartItems.length > 0">
+        <div class="col-xs-9 weui-cells weui-cells_checkbox total padding-none">
+            <label class="weui-cell weui-check__label" @click="checkAll">
+                <div class="weui-cell__hd">
+                    <input type="checkbox" class="weui-check" v-model="checkedAll">
+                    <i class="weui-icon-checked"></i>
+                </div>
+                <div class="weui-cell__bd">
+                    全选
+                </div>
+                <div class="weui-cell__ft" v-if="!editing">
+                    合计：￥{{getTotal() | price}}
+                </div>
+            </label>
+        </div>
+        <div class="col-xs-3 padding-none">
+            <button type="button"
+                    v-if="!editing"
+                    class="btn btn-flat settlement"
+                    :class="{disabled: selectedItems.length <= 0}"
+                    :disabled="selectedItems.length <= 0"
+                    @click="settlement">结算</button>
+            <button type="button"
+                    v-if="editing"
+                    class="btn btn-flat settlement"
+                    :class="{disabled: selectedItems.length <= 0}"
+                    :disabled="selectedItems.length <= 0"
+                    @click="removeSelected">删除</button>
+        </div>
+    </div>
+    <aside th:replace="wechat/common/aside"></aside>
+    <!-- /.content-wrapper -->
+</div>
+<!-- ./wrapper -->
+<footer th:replace="wechat/common/footer_statics"></footer>
+<script th:src="@{/static/js/wechat/cart/list.js}"></script>
+</body>
+</html>

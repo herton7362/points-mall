@@ -1,0 +1,50 @@
+<section id="product-sheet">
+    <actionsheet class="product-sheet" :instance="actionsheet" :button="null">
+        <template slot="header">
+            <div class="weui-panel__bd">
+                <div class="weui-media-box weui-media-box_appmsg">
+                    <div class="weui-media-box__hd">
+                        <img width="100%" :src="product.coverImage.id | coverPath">
+                    </div>
+                    <div class="weui-media-box__bd">
+                        <h4 class="weui-media-box__title">{{product.name}}</h4>
+                        <p class="weui-media-box__desc main-text-color">￥{{product.price | price}}</p>
+                    </div>
+                    <div class="cancel" @click="actionsheet.$instance.close()">
+                        <i class="fa fa-close"></i>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template slot="body">
+            <div class="weui-cell">
+                <div class="weui-cell__hd">购买数量：</div>
+                <div class="weui-cell__bd">
+                    <div class="input-group input-group-sm number pull-right">
+                        <div class="input-group-addon">
+                            <button
+                                    class="btn btn-sm btn-block btn-flat"
+                                    :class="{disabled: count <= 1}"
+                                    :disabled="count <= 1"
+                                    @click="reduce"> - </button>
+                        </div>
+                        <input type="text" pattern="[0-9]*" class="form-control" v-model="count">
+                        <div class="input-group-addon">
+                            <button class="btn btn-sm btn-block btn-flat" @click="increase"> + </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template slot="footer">
+            <div class="weui-flex">
+                <div class="weui-flex__item">
+                    <div class="weui-actionsheet__cell second-btn" @click="addCart">加入购物车</div>
+                </div>
+                <div class="weui-flex__item">
+                    <div class="weui-actionsheet__cell main-btn" @click="justBuy">立即购买</div>
+                </div>
+            </div>
+        </template>
+    </actionsheet>
+</section>

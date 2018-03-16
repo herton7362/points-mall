@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <template th:include="wechat/common/header_statics :: header('蹄铁商城 - 全部商品')" th:remove="tag"></template>
+    <link rel="stylesheet" th:href="@{/static/css/wechat.css}"/>
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<body class="layout-top-nav skin-yellow h5-layout" style="height: auto; min-height: 100%;">
+<div id="content"  class="wrapper product-detail" style="height: auto; min-height: 100%;">
+
+    <!-- Full Width Column -->
+    <div class="content-wrapper">
+        <div class="container">
+            <!-- Main content -->
+            <section class="content" v-cloak>
+                <div id="carousel-home-generic" style="margin-bottom: 0;" class="carousel slide margin-bottom" data-ride="carousel">
+                    <!-- Indicators -->
+                    <ol class="carousel-indicators">
+                        <li data-target="#carousel-home-generic"
+                            :data-slide-to="index"
+                            :class="{active: index === 0}"
+                            v-for="(row, index) in product.styleImages"></li>
+                    </ol>
+
+                    <!-- Wrapper for slides -->
+                    <div class="carousel-inner" role="listbox">
+                        <div class="item" :class="{active: index === 0}" v-for="(row, index) in product.styleImages">
+                            <img :src="row.id | coverPath" :alt="product.name" width="100%">
+                        </div>
+                    </div>
+
+                    <!-- Controls -->
+                    <a class="left carousel-control" href="#carousel-home-generic" role="button" data-slide="prev">
+                        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="right carousel-control" href="#carousel-home-generic" role="button" data-slide="next">
+                        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+                <div class="weui-cells" style="margin-top: 0;">
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd">
+                            <p class="title">{{product.name}}</p>
+                            <p class="main-text-color">￥{{product.price}}</p>
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd">
+                            <p class="deliver-price">运费：免运费</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="weui-cells">
+                    <a class="weui-cell weui-cell_access" th:href="@{/}">
+                        <div class="weui-cell__bd">
+                            <p>蹄铁商城</p>
+                        </div>
+                        <div class="weui-cell__ft">
+                            进入店铺
+                        </div>
+                    </a>
+                    <div class="weui-cell" v-if="product.points">
+                        <div class="weui-cell__bd">
+                            <p>
+                                <a href="javascript:;" class="weui-btn weui-btn_plain-primary btn-point">积分</a>
+                                购买可获得 {{product.points}} 积分
+                            </p>
+                        </div>
+                    </div>
+                    <div class="weui-cell statement">
+                        <div class="weui-cell__bd">
+                            <span class="margin-r-5"><i class="iconfont icon-success margin-r-5"></i> 企业认证</span>
+                            <span><i class="iconfont icon-success margin-r-5"></i> 担保交易</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="weui-cells" >
+                    <p>
+                        <img width="100%" :src="row.id | coverPath" alt="..." v-for="row in product.detailImages">
+                    </p>
+                </div>
+
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.container -->
+    </div>
+    <div class="row tabbar">
+        <a th:href="@{/wechat/cart/list}" class="col-xs-3 item">
+            <i class="fa fa-shopping-cart"></i>
+            <p>购物车</p>
+        </a>
+        <div class="col-xs-9 padding-none">
+            <div class="btn-group btn-block">
+                <button type="button" class="btn btn-flat add-cart second-btn" @click="addCart">加入购物车</button>
+                <button type="button" class="btn btn-flat just-buy main-btn" @click="justBuy">立即购买</button>
+            </div>
+        </div>
+    </div>
+    <aside th:replace="wechat/common/aside"></aside>
+    <!-- /.content-wrapper -->
+</div>
+<!-- ./wrapper -->
+<footer th:replace="wechat/common/footer_statics"></footer>
+<script th:src="@{/static/js/wechat/product/detail.js}"></script>
+</body>
+</html>

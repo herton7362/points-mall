@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <template th:include="admin/common/header_statics :: header('业务中心')" th:remove="tag"></template>
+    <link rel="stylesheet" th:href="@{/static/css/admin.css}"/>
+</head>
+<body class="hold-transition skin-yellow sidebar-mini">
+<!--[if lte IE 9]>
+<p class="browsehappy">你正在使用<strong>过时</strong>的浏览器，奎爷 暂不支持。 请 <a href="http://browsehappy.com/" target="_blank">升级浏览器</a>
+    以获得更好的体验！</p>
+<![endif]-->
+<!-- Site wrapper -->
+<div class="wrapper">
+    <header th:include="admin/common/header_html"></header>
+    <!-- =============================================== -->
+    <aside th:include="admin/common/aside"></aside>
+    <!-- =============================================== -->
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <h1>
+                业务中心
+                <small>会员业务办理中心</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li>会员管理</li>
+                <li class="active">业务中心</li>
+            </ol>
+        </section>
+
+        <!-- Main content -->
+        <section id="content" class="content" v-cloak>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="box box-primary">
+                        <div class="box-body box-profile">
+                            <img class="profile-user-img img-responsive img-circle" th:src="@{/static/image/default_user.jpg}" alt="User profile picture">
+
+                            <h3 class="profile-username text-center">{{member.name || '请输入会员卡号'}}</h3>
+
+                            <p class="text-muted text-center">{{member.level}}</p>
+                            <form role="form">
+                                <div class="box-body">
+                                    <div class="form-group">
+                                        <label>会员卡号 <button type="button" class="btn btn-success btn-xs" @click="findMember">读卡</button></label>
+                                        <input
+                                                type="text"
+                                                class="form-control"
+                                                v-model="member.cardNo"
+                                                placeholder="会员卡号"
+                                                v-focus="member"
+                                                ref="cardNo"
+                                                @keyup="findMember">
+                                    </div>
+                                    <ul class="list-group list-group-unbordered">
+                                        <li class="list-group-item">
+                                            <b>手机</b> <a class="pull-right">{{member.mobile}}</a>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <b>余额</b> <a class="pull-right">{{member.balance}}</a>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <b>总积分</b> <a class="pull-right">{{member.point}}</a>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <b>可消费积分</b> <a class="pull-right">{{member.salePoint}}</a>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <b>地区</b> <a class="pull-right">{{member.address}}</a>
+                                        </li>
+                                    </ul>
+                                    <a href="#" class="btn btn-primary btn-block btn-flat" @click="findMember"><b>读卡</b></a>
+                                </div>
+                                <!-- /.box-body -->
+                            </form>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                </div>
+
+                <div class="col-md-9">
+                    <div class="box box-primary">
+                        <div class="box-header">
+                            <h3 class="box-title"><i class="fa fa-th"></i> 快捷入口</h3>
+                        </div>
+                        <div class="box-body">
+                            <modal title="快速积分" :footer="true" type="MODAL_SM" :instance="fastIncreasePointModal">
+                                <template slot="body">
+                                    <input
+                                            type="text"
+                                            class="form-control"
+                                            v-model="fastIncreasePointModal.point"
+                                            ref="point"
+                                            @keyup.enter="fastIncreasePoint"
+                                            placeholder="积分">
+                                </template>
+                                <template slot="footer">
+                                    <button type="button" class="btn btn-block btn-primary btn-flat" @click="fastIncreasePoint" data-dismiss="modal">确定</button>
+                                </template>
+                            </modal>
+                            <a class="btn btn-app" @click="findMember">
+                                <i class="fa fa-credit-card"></i> 读卡
+                            </a>
+                            <a
+                                    class="btn btn-app"
+                                    @click="openFastIncreasePointModal"
+                                    :class="{'disabled': !memberExist()}"
+                                    :disabled="!memberExist()"
+                            >
+                                <i class="fa fa-dollar"></i> 快速积分
+                            </a>
+                            <a
+                                    class="btn btn-app"
+                                    @click="consume"
+                                    :class="{'disabled': !memberExist()}"
+                                    :disabled="!memberExist()"
+                            >
+                                <i class="fa fa-cart-plus"></i> 会员消费
+                            </a>
+                            <modal title="充值" :footer="true" type="MODAL_SM" :instance="rechargeModal">
+                                <template slot="body">
+                                    <input
+                                            type="text"
+                                            class="form-control"
+                                            v-model="rechargeModal.amount"
+                                            ref="recharge"
+                                            @keyup.enter="recharge"
+                                            placeholder="金额">
+                                </template>
+                                <template slot="footer">
+                                    <button type="button" class="btn btn-block btn-primary btn-flat" @click="recharge" data-dismiss="modal">确定</button>
+                                </template>
+                            </modal>
+                            <a
+                                    class="btn btn-app"
+                                    @click="openRechargeModal"
+                                    :class="{'disabled': !memberExist()}"
+                                    :disabled="!memberExist()"
+                            >
+                                <i class="fa fa-money"></i> 会员充值
+                            </a>
+                            <modal title="扣费" :footer="true" type="MODAL_SM" :instance="deductBalanceModal">
+                                <template slot="body">
+                                    <input
+                                            type="text"
+                                            class="form-control"
+                                            v-model="deductBalanceModal.amount"
+                                            ref="deductBalance"
+                                            @keyup.enter="deductBalance"
+                                            placeholder="金额">
+                                </template>
+                                <template slot="footer">
+                                    <button type="button" class="btn btn-block btn-primary btn-flat" @click="deductBalance" data-dismiss="modal">确定</button>
+                                </template>
+                            </modal>
+                            <a
+                                    class="btn btn-app"
+                                    @click="openDeductBalanceModal"
+                                    :class="{'disabled': !memberExist()}"
+                                    :disabled="!memberExist()"
+                            >
+                                <i class="fa fa-money"></i> 储值扣费
+                            </a>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    <div class="nav-tabs-custom tab-primary">
+                        <ul class="nav nav-tabs pull-right">
+                            <li class="active">
+                                <a data-toggle="tab" aria-expanded="true" @click="loadDeductBalanceRecord">储值扣费记录</a>
+                            </li>
+                            <li class="">
+                                <a data-toggle="tab" aria-expanded="true" @click="loadRechargeRecord">会员充值记录</a>
+                            </li>
+                            <li class="">
+                                <a data-toggle="tab" aria-expanded="true" @click="loadConsumeRecord">会员消费记录</a>
+                            </li>
+                            <li class="">
+                                <a data-toggle="tab" aria-expanded="true" @click="loadFastIncreasePointRecord">快速积分记录</a>
+                            </li>
+                            <li class="pull-left header">
+                                <h4><i class="fa fa-calendar"></i> 历史跟踪</h4>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <datagrid
+                                    :url="datagrid.url"
+                                    :query-params="datagrid.queryParams"
+                                    :columns="datagrid.columns"
+                                    :count="datagrid.count"
+                                    :pagination="true"
+                                    :data="datagrid.data"
+                                    :instance="datagrid"
+                                    :table-transform-response="tableTransformResponse">
+                            </datagrid>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <footer th:include="admin/common/footer_html"></footer>
+</div>
+<!-- ./wrapper -->
+<footer th:include="admin/common/footer_statics"></footer>
+<script th:src="@{/static/js/modules/member/businessCenter.js}"></script>
+</body>
+</html>

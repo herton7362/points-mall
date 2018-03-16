@@ -1,0 +1,45 @@
+body.login-page {
+    overflow: hidden;
+    background:url(../image/login-bg.jpg) repeat;
+}
+
+ul.pagination {
+    margin: 2px 0;
+    white-space: nowrap;
+}
+
+.dataTables_info {
+    margin: 6px 0;
+}
+
+.form-title {
+    margin: 0 0 18px 0;
+    padding: 0 15px;
+    min-height: 34px;
+    background: #eceff4;
+    line-height: 34px;
+    font-size: 14px;
+}
+
+.order-form .member-address {
+    margin-bottom: 18px;
+}
+
+.order-form .member-address:after {
+    content: ' ';
+    height: 2px;
+    background-image: url(../image/wechat/add_address_border.png);
+    background-size: 34px 2px;
+    display: block;
+    margin-left: -20px;
+    width: 600px;
+}
+
+.order-form .order-accounts {
+    background-color: #f8f8f8;
+    margin: 0 -20px 18px -20px;
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid  #ddd;
+}

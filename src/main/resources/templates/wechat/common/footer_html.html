@@ -1,0 +1,6 @@
+<div id="tabbar" class="row tabbar" v-cloak>
+    <a :href="row.url" class="col-xs-3 item" :class="{active: row.active}" v-for="row in menus">
+        <i :class="row.icon"></i>
+        <p>{{row.name}}</p>
+    </a>
+</div>

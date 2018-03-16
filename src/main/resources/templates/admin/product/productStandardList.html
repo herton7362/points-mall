@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <template th:include="admin/common/header_statics :: header('产品列表')" th:remove="tag"></template>
+    <link rel="stylesheet" th:href="@{/static/css/admin.css}"/>
+</head>
+<body class="hold-transition skin-yellow sidebar-mini">
+<!--[if lte IE 9]>
+<p class="browsehappy">你正在使用<strong>过时</strong>的浏览器，奎爷 暂不支持。 请 <a href="http://browsehappy.com/" target="_blank">升级浏览器</a>
+    以获得更好的体验！</p>
+<![endif]-->
+<!-- Site wrapper -->
+<div class="wrapper">
+    <header th:include="admin/common/header_html"></header>
+    <!-- =============================================== -->
+    <aside th:include="admin/common/aside"></aside>
+    <!-- =============================================== -->
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper product-standard">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <h1>
+                商品规格维护
+                <small>商品规格录入与修改</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li>商品管理</li>
+                <li class="active">商品规格维护</li>
+            </ol>
+        </section>
+
+        <!-- Main content -->
+        <section id="content" class="content" v-cloak>
+            <div class="row">
+                <div class="col-md-12">
+                    <crudgrid
+                            domain="productStandard"
+                            :columns="crudgrid.columns"
+                            :form-data="formData"
+                            :instance="crudgrid"
+                    >
+                        <template slot="form-body" scope="props">
+                            <div class="form-group">
+                                <label>名称：</label>
+                                <input type="text" class="form-control" required v-model="props.form.name" placeholder="输入规格名称">
+                            </div>
+                            <div class="form-group">
+                                <label>备注：</label>
+                                <input type="text" class="form-control" v-model="props.form.remark" placeholder="输入规格备注">
+                            </div>
+                            <div class="form-group">
+                                <button type="button" class="btn btn-info" @click="addItem"> <i class="fa fa-plus"></i> 增加规格条目</button>
+                            </div>
+                            <div class="dataTables_wrapper">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <form class="form-horizontal">
+                                            <draggable v-model="props.form.items" @update="itemSort(props.form.items)" :options="{handle:'.draggable-handler'}">
+                                                <div class="form-group" v-for="item in props.form.items">
+                                                    <div class="col-xs-8">
+                                                        <div class="row">
+                                                            <label class="col-sm-2 control-label">名称</label>
+                                                            <div class="col-sm-10">
+                                                                <input type="text" class="form-control" v-model="item.name" placeholder="输入规格条目名称">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xs-4" style="padding-top: 5px;">
+                                                        <a title="拖拽移动" class="btn btn-xs bg-purple margin-r-5 draggable-handler">
+                                                            <i class="fa fa-arrows"></i>
+                                                        </a>
+                                                        <a title="删除" class="btn btn-xs bg-red" @click="removeItem(item, $event)">
+                                                            <i class="fa fa-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </draggable>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </crudgrid>
+                </div>
+            </div>
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <footer th:include="admin/common/footer_html"></footer>
+</div>
+<!-- ./wrapper -->
+<footer th:include="admin/common/footer_statics"></footer>
+<script th:src="@{/static/js/modules/product/productStandardList.js}"></script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<footer xmlns:th="http://www.thymeleaf.org">
+    <script th:inline="javascript">
+        window._appConf = window._appConf || {};
+        window._appConf = {
+            version: '1.0.0',
+            ctx: window._appConf.ctx || '',
+            loginUrl: window._appConf.loginUrl || '/wechat/login',
+            appId: window._appConf.appId || 'tonr',
+            appSecret: window._appConf.appSecret || 'secret'
+        };
+    </script>
+    <script th:src="@{/webjars/require.js}"></script>
+    <script th:src="@{/webjars/plugins/wechat/main.js}"></script>
+    <script>
+        requirejs.config({
+            urlArgs: "v=" + window._appConf.version,
+            baseUrl: (window._appConf.ctx || '') + '/webjars/plugins/wechat/',
+            waitSeconds: 0,
+            paths: {
+                'base-jquery': '../jquery/js/jquery-2.1.4.min',
+                'jquery': 'jquery/jquery',
+                'bootstrap': '../bootstrap/js/bootstrap.min',
+                'base-adminlte': '../AdminLTE/js/adminlte.min',
+                'adminlte': '../AdminLTE/adminlte',
+                'base-vue': '../vue/js/vue.min',
+                'validator': '../validator/validator',
+                'messager': 'messager/js/messager',
+                'vue':'vue/vue',
+                'utils': 'utils/utils',
+                'app': '../utils/app',
+                'weui': '../weui/weui.min',
+                'actionsheet': 'actionsheet/actionsheet',
+                'modal': 'modal/modal',
+                'sidemodal': 'sidemodal/sidemodal'
+            },
+            shim: {
+                'jquery': ['base-jquery'],
+                'vue': [
+                    'base-vue',
+                    'validator',
+                    'actionsheet',
+                    'modal'
+                ],
+                'messager': ['jquery', 'vue', 'css!../wechat/messager/css/messager.css'],
+                'bootstrap': ['jquery'],
+                'base-adminlte': ['bootstrap'],
+                'adminlte': [
+                    'base-adminlte',
+                    'css!../AdminLTE/css/Ionicons/css/ionicons.min.css',
+                    'css!../AdminLTE/css/font-awesome/css/font-awesome.min.css',
+                    'css!../AdminLTE/css/datatables.net-bs/dataTables.bootstrap.min.css'
+                ],
+                'validator': ['jquery', 'app'],
+                'weui': ['jquery', 'css!../weui/weui.min.css'],
+                'actionsheet': ['jquery', 'css!../wechat/actionsheet/actionsheet.css'],
+                'modal': ['jquery', 'css!../wechat/modal/modal.css'],
+                'utils': ['app'],
+                'sidemodal': ['jquery', 'utils']
+            },
+            map: {
+                '*': {
+                    'css': (window._appConf.ctx || '') + '/webjars/plugins/css.min.js',
+                    'text': (window._appConf.ctx || '') + '/webjars/plugins/text.js'
+                }
+            }
+        });
+        require(['jquery', 'vue', 'utils'], function ($, Vue, utils) {
+            function selectMenu(vue) {
+                var url = location.pathname;
+                $.each(vue.menus, function() {
+                    if(this.url.split('?')[0] === url) {
+                        Vue.set(this, 'active', true);
+                    }
+                });
+            }
+            if($('#tabbar').length <= 0) {
+                return;
+            }
+            new Vue({
+                el: '#tabbar',
+                data: {
+                    menus: [
+                        {
+                            name: '首页',
+                            url: utils.patchUrlPrefixUrl('/'),
+                            icon: 'iconfont icon-all',
+                            active: false
+                        }, {
+                            name: '全部商品',
+                            url: utils.patchUrlPrefixUrl('/wechat/product/all'),
+                            icon: 'iconfont icon-navlist',
+                            active: false
+                        }, {
+                            name: '购物车',
+                            url: utils.patchUrlPrefixUrl('/wechat/cart/list'),
+                            icon: 'iconfont icon-cart',
+                            active: false
+                        }, {
+                            name: '个人中心',
+                            url: utils.patchUrlPrefixUrl('/wechat/member/profile'),
+                            icon: 'iconfont icon-gerenzhongxin',
+                            active: false
+                        }
+                    ]
+                },
+                mounted: function () {
+                    selectMenu(this);
+                }
+            });
+        })
+    </script>
+</footer>

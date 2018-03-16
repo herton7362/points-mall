@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <template th:include="wechat/common/header_statics :: header('蹄铁商城 - 申请退货')" th:remove="tag"></template>
+    <link rel="stylesheet" th:href="@{/static/css/wechat.css}"/>
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<body class="layout-top-nav skin-yellow h5-layout" style="height: auto; min-height: 100%;">
+<div id="content"  class="wrapper orderform-new product-list" style="height: auto; min-height: 100%;" v-cloak>
+
+    <!-- Full Width Column -->
+    <div class="content-wrapper">
+        <div class="container">
+            <!-- Main content -->
+            <section class="content">
+                <div class="weui-cells" style="margin-top: 0">
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd">
+                            <p>
+                                注：优惠券不予返还。积分，余额按原路返还。
+                            </p>
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd">
+                            <textarea class="weui-textarea" maxlength="200" placeholder="请输入退货原因" v-model="applyRejectRemark" rows="3"></textarea>
+                            <div class="weui-textarea-counter"><span>{{applyRejectRemark.length}}</span>/200</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="weui-cells">
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd">
+                            <p>商品金额</p>
+                        </div>
+                        <div class="weui-cell__bd" style="text-align: right">
+                            <p>￥{{getTotal() | price}}</p>
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd">
+                            <p>运费</p>
+                        </div>
+                        <div class="weui-cell__bd" style="text-align: right">
+                            <p> + ￥0.00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="weui-cells">
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd">
+                            <p>优惠券</p>
+                        </div>
+                        <div class="weui-cell__ft">
+                            <template v-if="orderForm.coupon && orderForm.coupon.amount">
+                                - ￥{{orderForm.coupon.amount | price}}
+                            </template>
+                            <template v-if="!orderForm.coupon || !orderForm.coupon.amount">
+                                无
+                            </template>
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd">
+                            <p>
+                                积分抵扣
+                            </p>
+                        </div>
+                        <div class="weui-cell__ft">
+                            <template v-if="orderForm.point">
+                                - ￥{{orderForm.point/100}}（{{orderForm.point}}）
+                            </template>
+                            <template v-if="!orderForm.point">
+                                无
+                            </template>
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd">
+                            <p>
+                                余额支付
+                            </p>
+                        </div>
+                        <div class="weui-cell__ft">
+                            <template v-if="orderForm.balance">
+                                - ￥{{orderForm.balance}}
+                            </template>
+                            <template v-if="!orderForm.balance">
+                                无
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="weui-cells">
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd">
+                            <p>订单编号</p>
+                        </div>
+                        <div class="weui-cell__bd" style="text-align: right">
+                            <p>{{orderForm.orderNumber}}</p>
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd">
+                            <p>创建时间</p>
+                        </div>
+                        <div class="weui-cell__bd" style="text-align: right">
+                            <p> {{orderForm.createdDate | date}}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="weui-cells" v-if="orderForm.status == 'DELIVERED'">
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd">
+                            <p>运单号</p>
+                        </div>
+                        <div class="weui-cell__bd" style="text-align: right">
+                            <p>{{orderForm.shippingCode}}</p>
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd">
+                            <p>发货时间</p>
+                        </div>
+                        <div class="weui-cell__bd" style="text-align: right">
+                            <p> {{orderForm.shippingDate | date}}</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.container -->
+    </div>
+    <div class="row tabbar">
+        <div class="col-xs-12 padding-none">
+            <button type="button" class="btn btn-flat submit-order main-btn" @click="applyReject">申请退货</button>
+        </div>
+    </div>
+    <aside th:replace="wechat/common/aside"></aside>
+    <!-- /.content-wrapper -->
+</div>
+<!-- ./wrapper -->
+<footer th:replace="wechat/common/footer_statics"></footer>
+<script th:src="@{/static/js/wechat/orderform/applyReject.js}"></script>
+</body>
+</html>

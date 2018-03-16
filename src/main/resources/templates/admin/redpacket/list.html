@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <template th:include="admin/common/header_statics :: header('红包管理')" th:remove="tag"></template>
+    <link rel="stylesheet" th:href="@{/static/css/admin.css}"/>
+</head>
+<body class="hold-transition skin-yellow sidebar-mini">
+<!--[if lte IE 9]>
+<p class="browsehappy">你正在使用<strong>过时</strong>的浏览器，奎爷 暂不支持。 请 <a href="http://browsehappy.com/" target="_blank">升级浏览器</a>
+    以获得更好的体验！</p>
+<![endif]-->
+<!-- Site wrapper -->
+<div class="wrapper">
+    <header th:include="admin/common/header_html"></header>
+    <!-- =============================================== -->
+    <aside th:include="admin/common/aside"></aside>
+    <!-- =============================================== -->
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <h1>
+                充值红包管理
+                <small>充值赠送红包规则配置</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li>营销管理</li>
+                <li class="active">充值红包管理</li>
+            </ol>
+        </section>
+
+        <!-- Main content -->
+        <section id="content" class="content" v-cloak>
+            <div class="row">
+                <div class="col-md-12">
+                    <crudgrid
+                            domain="redPacket"
+                            :columns="crudgrid.columns"
+                            :form-data="formData"
+                            :instance="crudgrid"
+                    >
+                        <template slot="form-body" scope="props">
+                            <div class="form-group">
+                                <label>赠送金额：</label>
+                                <input type="text" class="form-control" required v-model="props.form.amount" placeholder="输入赠送金额">
+                            </div>
+                            <div class="form-group">
+                                <label>使用条件：满 ? 元，无门槛请输入0：</label>
+                                <input type="text" class="form-control" required v-model="props.form.minAmount" placeholder="输入起送金额">
+                            </div>
+                            <div class="form-group">
+                                <label>开始时间：</label>
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <datepicker required v-model="props.form.startDate"></datepicker>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>结束时间：</label>
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <datepicker required v-model="props.form.endDate"></datepicker>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>备注：</label>
+                                <input type="text" class="form-control" v-model="props.form.remark" placeholder="输入备注">
+                            </div>
+                        </template>
+                    </crudgrid>
+                </div>
+            </div>
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <footer th:include="admin/common/footer_html"></footer>
+</div>
+<!-- ./wrapper -->
+<footer th:include="admin/common/footer_statics"></footer>
+<script th:src="@{/static/js/modules/redpacket/list.js}"></script>
+</body>
+</html>

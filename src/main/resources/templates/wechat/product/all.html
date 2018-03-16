@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <template th:include="wechat/common/header_statics :: header('蹄铁商城 - 全部商品')" th:remove="tag"></template>
+    <link rel="stylesheet" th:href="@{/static/css/wechat.css}"/>
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<body class="layout-top-nav skin-yellow h5-layout" style="height: auto; min-height: 100%;">
+<div class="wrapper" style="height: auto; min-height: 100%;">
+
+    <!-- Full Width Column -->
+    <div class="content-wrapper product-list">
+        <div class="container">
+            <!-- Main content -->
+            <section id="content" class="content" v-cloak>
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs wechat-tabs" role="tablist">
+                    <li role="presentation" :class="{active: row.id === activeId}" v-for="row in productCategories">
+                        <a :href="'#'+row.id" @click="tabClick(row.id)" :aria-controls="row.id" role="tab" data-toggle="tab">{{row.name}}</a>
+                    </li>
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content wechat-tab-content">
+                    <div v-for="row in productCategories" role="tabpanel" class="tab-pane" :class="{active: row.id === activeId}" :id="row.id">
+                        <div class="col-xs-6 col-md-4 padding-none" v-for="product in products[row.id]">
+                            <div class="thumbnail margin-5" @click="productDetail(product)">
+                                <img :alt="product.name" :src="product.coverImage.id | coverPath">
+                                <div class="caption">
+                                    <p class="product-title">{{product.name}}</p>
+                                    <p>
+                                        <em class="product-price">¥ {{product.price | price}}</em>
+                                        <a href="javascript:void(0)" class="pull-right add-cart-button" @click.stop="addCart(product)">
+                                            <i class="iconfont icon-cart"></i>
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pagination" v-if="totalPage > 1">
+                    <div class="btn-group">
+                        <button type="button"
+                                class="btn btn-default btn-sm"
+                                @click="prev"
+                                :class="{disabled: currentPage <= 1}"
+                                :disabled="currentPage <= 1">上一页</button>
+                        <button type="button"
+                                class="btn btn-default btn-sm"
+                                @click="next"
+                                :class="{disabled: currentPage >= totalPage}"
+                                :disabled="currentPage >= totalPage">下一页</button>
+                    </div>
+                </div>
+
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.container -->
+    </div>
+    <aside th:replace="wechat/common/aside"></aside>
+    <!-- /.content-wrapper -->
+    <footer th:replace="wechat/common/footer_html"></footer>
+</div>
+<!-- ./wrapper -->
+<footer th:replace="wechat/common/footer_statics"></footer>
+<script th:src="@{/static/js/wechat/product/all.js}"></script>
+</body>
+</html>

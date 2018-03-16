@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <template th:include="wechat/common/header_statics :: header('蹄铁商城 - 个人中心')" th:remove="tag"></template>
+    <link rel="stylesheet" th:href="@{/static/css/wechat.css}"/>
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<body class="layout-top-nav skin-yellow h5-layout" style="height: auto; min-height: 100%;">
+<div id="content"  class="wrapper profile" style="height: auto; min-height: 100%;" v-cloak>
+
+    <!-- Full Width Column -->
+    <div class="content-wrapper">
+        <div class="container">
+            <!-- Main content -->
+            <section class="content">
+                <div class="box box-widget widget-user">
+                    <!-- Add the bg color to the header using any of the bg-* classes -->
+                    <div class="widget-user-header bg-black">
+                        <h3 class="widget-user-username">
+                            {{member.name}}
+                            <span class="weui-badge" style="margin-left: 5px;vertical-align: middle">{{memberLevel.name}}</span>
+                        </h3>
+                        <!--<i class="widget-user-config fa fa-cog">资料修改</i>-->
+                    </div>
+                    <div class="widget-user-image">
+                        <img class="img-circle" :src="getHeadPhoto()" :alt="member.name">
+                    </div>
+                    <div class="box-footer">
+                        <div class="row">
+                            <div class="col-xs-4 border-right">
+                                <div class="description-block">
+                                    <h5 class="description-header">{{member.balance | price}}</h5>
+                                    <span class="description-text"><i class="iconfont icon-trade"></i> 余额</span>
+                                </div>
+                                <!-- /.description-block -->
+                            </div>
+                            <!-- /.col -->
+                            <div class="col-xs-4 border-right">
+                                <div class="description-block">
+                                    <h5 class="description-header">{{member.point}}</h5>
+                                    <span class="description-text"><i class="iconfont icon-jifen"></i> 总积分</span>
+                                </div>
+                                <!-- /.description-block -->
+                            </div>
+                            <!-- /.col -->
+                            <div class="col-xs-4 border-right">
+                                <div class="description-block">
+                                    <h5 class="description-header">{{member.salePoint}}</h5>
+                                    <span class="description-text"><i class="iconfont icon-jifen2"></i> 可消费积分</span>
+                                </div>
+                                <!-- /.description-block -->
+                            </div>
+                            <!-- /.col -->
+                        </div>
+                        <!-- /.row -->
+                    </div>
+                </div>
+                <div class="weui-cells">
+                    <div class="weui-cell weui-cell_access" @click="orderForm('all')">
+                        <div class="weui-cell__bd">
+                            <p><i class="iconfont icon-form"></i> 商城订单</p>
+                        </div>
+                        <div class="weui-cell__ft">
+                        </div>
+                    </div>
+                    <div class="weui-cell form-icons">
+                        <div class="weui-cell__bd">
+                            <div class="weui-flex">
+                                <div class="weui-flex__item" @click="orderForm('un_pay')">
+                                    <i class="iconfont icon-unpay">
+                                        <span class="weui-badge" v-if="formCount.UN_PAY">{{formCount.UN_PAY}}</span>
+                                    </i>
+                                    <p>待支付</p>
+                                </div>
+                                <div class="weui-flex__item" @click="orderForm('payed')">
+                                    <i class="iconfont icon-payed">
+                                        <span class="weui-badge" v-if="formCount.PAYED">{{formCount.PAYED}}</span>
+                                    </i>
+                                    <p>待发货</p>
+                                </div>
+                                <div class="weui-flex__item" @click="orderForm('delivered')">
+                                    <i class="iconfont icon-delivered">
+                                        <span class="weui-badge" v-if="formCount.DELIVERED">{{formCount.DELIVERED}}</span>
+                                    </i>
+                                    <p>已发货</p>
+                                </div>
+                                <div class="weui-flex__item" @click="orderForm('received')">
+                                    <i class="iconfont icon-received">
+                                        <span class="weui-badge" v-if="formCount.RECEIVED">{{formCount.RECEIVED}}</span>
+                                    </i>
+                                    <p>已完成</p>
+                                </div>
+                                <div class="weui-flex__item" @click="orderForm('apply_rejected')">
+                                    <i class="iconfont icon-rejected">
+                                        <span class="weui-badge" v-if="formCount.APPLY_REJECTED">{{formCount.APPLY_REJECTED}}</span>
+                                    </i>
+                                    <p>退款/售后</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="weui-cell weui-cell_access" @click="coupon">
+                        <div class="weui-cell__bd">
+                            <p>
+                                <i class="iconfont icon-youhuiquan"></i>
+                                优惠券
+                                <span class="weui-badge" style="margin-left: 5px;" v-if="couponCount > 0">{{couponCount}}</span>
+                            </p>
+                        </div>
+                        <div class="weui-cell__ft">
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.container -->
+    </div>
+    <aside th:replace="wechat/common/aside"></aside>
+    <!-- /.content-wrapper -->
+    <footer th:replace="wechat/common/footer_html"></footer>
+</div>
+<!-- ./wrapper -->
+<footer th:replace="wechat/common/footer_statics"></footer>
+<script th:src="@{/static/js/wechat/member/profile.js}"></script>
+</body>
+</html>
