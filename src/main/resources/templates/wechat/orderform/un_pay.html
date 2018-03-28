@@ -72,6 +72,27 @@
                             <p>普通快递</p>
                         </div>
                     </div>
+                    <div class="weui-cells__title">支付方式</div>
+                    <div class="weui-cells weui-cells_checkbox">
+                        <label class="weui-cell weui-check__label" >
+                            <div class="weui-cell__hd">
+                                <input type="radio" class="weui-check" name="payType" v-model="payType" value="wechat">
+                                <i class="weui-icon-checked"></i>
+                            </div>
+                            <div class="weui-cell__bd">
+                                <p>微信</p>
+                            </div>
+                        </label>
+                        <label class="weui-cell weui-check__label">
+                            <div class="weui-cell__hd">
+                                <input type="radio" name="payType" class="weui-check" v-model="payType" value="ali">
+                                <i class="weui-icon-checked"></i>
+                            </div>
+                            <div class="weui-cell__bd">
+                                <p>支付宝</p>
+                            </div>
+                        </label>
+                    </div>
                     <div class="weui-cell">
                         <div class="weui-cell__hd"><label class="weui-label">买家留言：</label></div>
                         <div class="weui-cell__bd">

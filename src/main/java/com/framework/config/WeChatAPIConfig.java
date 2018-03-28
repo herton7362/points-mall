@@ -17,6 +17,6 @@ public class WeChatAPIConfig implements WeChatAPIConfigurer {
         weChatPayConfig.setAppSecret("77ahhdskkqwuiqjhda8989wejasdq2ad");
         weChatPayConfig.setApiKey("77ahhdskkqwuiqjhda8989wejasdq2ad");
         weChatPayConfig.setMchId("1486889962");
-        weChatPayConfig.setNotifyUrl("http://www.dldjshop.com/wechat/pay/notify");
+        weChatPayConfig.setNotifyUrl("http://jifen.dldjshop.com/wechat/pay/notify");
     }
 }

@@ -251,6 +251,20 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
         return result;
     }
 
+    @Override
+    public void payed(String outTradeNo) throws Exception {
+        Map<String, String[]> param = new HashMap<>();
+        param.put("orderNumber", new String[]{outTradeNo});
+        List<OrderForm> orderForms = findAll(param);
+        if(orderForms != null && !orderForms.isEmpty()) {
+            OrderForm orderForm = orderForms.get(0);
+            orderForm.setStatus(OrderForm.OrderStatus.PAYED);
+            orderForm.setPaymentStatus(OrderForm.PaymentStatus.PAYED);
+            orderFormRepository.save(orderForm);
+            consumeModifyMemberAccount(orderForm);
+        }
+    }
+
     /**
      * 要求外部订单号必须唯一。
      * @return 订单号

@@ -11,7 +11,8 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
                 cash: 0,
                 balance: 0,
                 point: 0
-            }
+            },
+            payType: 'wechat'
         },
         filters: {
             coverPath: function (val) {
@@ -67,6 +68,12 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
                 $.ajax({
                     url: utils.patchUrl('/api/orderForm/' + utils.getQueryString('id')),
                     success: function(data) {
+                        if(data.status === 'PAYED') {
+                            messager.bubble("支付成功", 'success');
+                            setTimeout(function () {
+                                window.location.href = utils.patchUrlPrefixUrl('/wechat/orderform/list?page=all');
+                            }, 1000);
+                        }
                         self.orderForm = data;
                         self.account.point = data.point;
                         self.account.balance = data.balance;
@@ -100,12 +107,17 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
                         }
                     })
                 }
-                this.account.cash = this.getFinalTotal();
-                if(self.account.cash === 0) {
-                    pay();
-                } else {
+                function wechatWebPay() {
+                    window.location.href = utils.patchUrl('/api/orderForm/wechat/web/unified?orderNumber=' +
+                        self.orderForm.orderNumber + '&cash=' + self.account.cash);
+                }
+                function aliWebPay() {
+                    window.location.href = utils.patchUrl('/api/orderForm/ali/web/unified?orderNumber=' +
+                        self.orderForm.orderNumber + '&cash=' + self.account.cash);
+                }
+                function wechatAppPay() {
                     $.ajax({
-                        url: utils.patchUrl('/api/orderForm/unified'),
+                        url: utils.patchUrl('/api/orderForm/wechat/unified'),
                         contentType: 'application/json',
                         type: 'post',
                         data: JSON.stringify($.extend(self.orderForm, {
@@ -114,6 +126,7 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
                             point: self.account.point
                         })),
                         success: function (data) {
+
                             function setupWebViewJavascriptBridge(callback) {
                                 var bridge = window.WebViewJavascriptBridge || window.WKWebViewJavascriptBridge;
                                 if (bridge) { return callback(bridge); }
@@ -134,6 +147,7 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
                             }
 
                             setupWebViewJavascriptBridge(function(bridge) {
+
                                 /* Initialize your app here */
                                 bridge.callHandler('wechatpay', JSON.stringify(data), function responseCallback(responseData) {
                                     responseData = eval('('+responseData+')');
@@ -146,6 +160,72 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
                             });
                         }
                     });
+                }
+
+                function aliAppPay() {
+                    $.ajax({
+                        url: utils.patchUrl('/api/orderForm/ali/unified'),
+                        contentType: 'application/json',
+                        type: 'post',
+                        data: JSON.stringify($.extend(self.orderForm, {
+                            cash: self.account.cash,
+                            balance: self.account.balance,
+                            point: self.account.point
+                        })),
+                        success: function (data) {
+
+                            function setupWebViewJavascriptBridge(callback) {
+                                var bridge = window.WebViewJavascriptBridge || window.WKWebViewJavascriptBridge;
+                                if (bridge) { return callback(bridge); }
+                                var callbacks = window.WVJBCallbacks || window.WKWVJBCallbacks;
+                                if (callbacks) { return callbacks.push(callback); }
+                                window.WVJBCallbacks = window.WKWVJBCallbacks = [callback];
+                                if (window.WKWebViewJavascriptBridge) {
+                                    //for https://github.com/Lision/WKWebViewJavascriptBridge
+                                    window.webkit.messageHandlers.iOS_Native_InjectJavascript.postMessage(null);
+                                } else {
+                                    //for https://github.com/marcuswestin/WebViewJavascriptBridge
+                                    var WVJBIframe = document.createElement('iframe');
+                                    WVJBIframe.style.display = 'none';
+                                    WVJBIframe.src = 'https://__bridge_loaded__';
+                                    document.documentElement.appendChild(WVJBIframe);
+                                    setTimeout(function() { document.documentElement.removeChild(WVJBIframe) }, 0);
+                                }
+                            }
+
+                            setupWebViewJavascriptBridge(function(bridge) {
+
+                                /* Initialize your app here */
+                                bridge.callHandler('alipay', JSON.stringify(data), function responseCallback(responseData) {
+                                    responseData = eval('('+responseData+')');
+                                    if(responseData.result === 'ok') {
+                                        pay();
+                                    } else {
+                                        messager.bubble("支付失败", 'error');
+                                    }
+                                });
+                            });
+                        }
+                    });
+                }
+                this.account.cash = this.getFinalTotal();
+                var ua = navigator.userAgent;
+                if(self.account.cash === 0) {
+                    pay();
+                } else {
+                    if(this.payType === 'wechat') {
+                        if(ua.indexOf('Android_WebView') > -1) {
+                            wechatAppPay();
+                        } else {
+                            wechatWebPay();
+                        }
+                    } else {
+                        if(ua.indexOf('Android_WebView') > -1) {
+                            aliAppPay();
+                        } else {
+                            aliWebPay()
+                        }
+                    }
                 }
 
             }

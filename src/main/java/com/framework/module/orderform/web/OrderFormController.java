@@ -4,6 +4,8 @@ import com.framework.module.orderform.domain.OrderForm;
 import com.framework.module.orderform.service.OrderFormService;
 import com.kratos.common.AbstractCrudController;
 import com.kratos.common.CrudService;
+import com.kratos.kits.alipay.AliPayAPI;
+import com.kratos.kits.alipay.AliPayResult;
 import com.kratos.kits.wechat.WeChatAPI;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -13,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +27,7 @@ import java.util.Map;
 public class OrderFormController extends AbstractCrudController<OrderForm> {
     private final OrderFormService orderFormService;
     private final WeChatAPI weChatAPI;
+    private final AliPayAPI aliPayAPI;
     @Override
     protected CrudService<OrderForm> getService() {
         return orderFormService;
@@ -141,20 +145,59 @@ public class OrderFormController extends AbstractCrudController<OrderForm> {
     }
 
     /**
-     * 获取预付订单
+     * 微信获取预付订单
      */
     @ApiOperation(value="获取预付订单")
-    @RequestMapping(value = "/unified", method = RequestMethod.POST)
+    @RequestMapping(value = "/wechat/unified", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> unified(@RequestBody OrderForm orderForm, HttpServletRequest request) throws Exception {
         return new ResponseEntity<>(weChatAPI.makeAppUnifiedOrder(orderForm.getOrderNumber(), request, ((Double)(orderForm.getCash()*100D)).intValue()), HttpStatus.OK);
+    }
+
+    /**
+     * 微信获取预付订单
+     */
+    @ApiOperation(value="获取预付订单")
+    @RequestMapping(value = "/wechat/web/unified", method = RequestMethod.GET)
+    public void webUnified(HttpServletRequest request,
+                           HttpServletResponse response) throws Exception {
+        Map<String, String[]> param = request.getParameterMap();
+        Map<String, Object> map = weChatAPI.makeWebUnifiedOrder(param.get("orderNumber")[0], request, ((Double)(Double.valueOf(param.get("cash")[0])*100D)).intValue());
+        System.out.println((String) map.get("mwebUrl"));
+        response.addHeader("location", (String) map.get("mwebUrl"));
+        response.setStatus(302);
+    }
+
+    /**
+     * 支付宝获取预付订单
+     */
+    @ApiOperation(value="获取预付订单")
+    @RequestMapping(value = "/ali/unified", method = RequestMethod.POST)
+    public ResponseEntity<AliPayResult> unified(@RequestBody OrderForm orderForm) throws Exception {
+        return aliPayAPI.getAliPayOrderId(orderForm.getOrderNumber(), String.valueOf(orderForm.getCash()), "鼎骏商城");
+    }
+
+    /**
+     * 支付宝获取预付订单
+     */
+    @ApiOperation(value="获取预付订单")
+    @RequestMapping(value = "/ali/web/unified", method = RequestMethod.GET)
+    public void aliWebUnified(HttpServletRequest request,
+                              HttpServletResponse response) throws Exception {
+        Map<String, String[]> param = request.getParameterMap();
+        response.setContentType("text/html;charset=UTF-8");
+        response.getWriter().write(aliPayAPI.getWebAliPayForm(param.get("orderNumber")[0], param.get("cash")[0], "鼎骏商城"));//直接将完整的表单html输出到页面
+        response.getWriter().flush();
+        response.getWriter().close();
     }
 
     @Autowired
     public OrderFormController(
             OrderFormService orderFormService,
-            WeChatAPI weChatAPI
+            WeChatAPI weChatAPI,
+            AliPayAPI aliPayAPI
     ) {
         this.orderFormService = orderFormService;
         this.weChatAPI = weChatAPI;
+        this.aliPayAPI = aliPayAPI;
     }
 }

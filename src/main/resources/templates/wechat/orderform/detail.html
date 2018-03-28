@@ -19,6 +19,7 @@
                             <p>
                                 <i class="iconfont icon-form"></i>
                                 订单状态：{{orderForm.status | status}}
+                                <span v-if="orderForm.status == 'PAYED'">等待发货</span>
                             </p>
                         </div>
                     </div>

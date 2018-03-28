@@ -22,7 +22,7 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
                 }
             ],
             orderForms: [],
-            activeId: utils.getQueryString('page'),
+            activeId: utils.getQueryString('page')? utils.getQueryString('page'): 'all',
             loading: true,
             orderStatus: []
         },

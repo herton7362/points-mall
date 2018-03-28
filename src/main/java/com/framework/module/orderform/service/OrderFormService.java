@@ -70,4 +70,10 @@ public interface OrderFormService extends CrudService<OrderForm> {
      * @return 每日销售额
      */
     List<Map<String, Object>> getEverydaySale() throws Exception;
+
+    /**
+     * 已支付
+     * @param outTradeNo 订单id
+     */
+    void payed(String outTradeNo) throws Exception;
 }
