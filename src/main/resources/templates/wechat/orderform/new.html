@@ -270,8 +270,12 @@
                         <span v-if="!coupon.expired">立即使用</span>
                         <a href="javascript:void(0)"
                            class="weui-btn weui-btn_plain-default btn-claim"
-                           v-if="!coupon.expired"
+                           v-if="!coupon.expired && orderForm.coupon.id !== coupon.id"
                            @click="useCoupon(coupon)">使用</a>
+                        <a href="javascript:void(0)"
+                           class="weui-btn weui-btn_plain-default btn-claim"
+                           v-if="orderForm.coupon.id === coupon.id"
+                           @click="cancelUseCoupon(coupon)">取消</a>
                     </div>
                     <div class="left-circle"></div>
                     <div class="right-circle"></div>

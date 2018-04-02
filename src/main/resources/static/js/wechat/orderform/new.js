@@ -196,9 +196,15 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
             },
             loadCarts: function (id) {
                 var self = this;
+                var itemIds = utils.getQueryString('items');
                 $.ajax({
                     url: utils.patchUrl('/api/cart/' + id),
                     success: function(data) {
+                        for (var i = data.items.length - 1; i >= 0; i--) {
+                            if(itemIds.indexOf(data.items[i].id) < 0) {
+                                data.items.splice(i, 1);
+                            }
+                        }
                         self.orderForm.items = data.items;
                     }
                 })
@@ -288,6 +294,10 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
             },
             useCoupon: function (coupon) {
                 this.orderForm.coupon = coupon;
+                window.history.go(-1);
+            },
+            cancelUseCoupon: function() {
+                this.orderForm.coupon = {amount: 0};
                 window.history.go(-1);
             },
             selectPoint: function () {

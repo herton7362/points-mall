@@ -99,9 +99,9 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
         }
         member.setSalePoint(increaseNumber(member.getSalePoint(), orderForm.getReturnedPoint()));
         member.setSalePoint(subtractNumber(member.getSalePoint(), productPoints));
-        member.setBalance(increaseMoney(member.getBalance(), orderForm.getBalance()));
+        member.setBalance(increaseMoney(member.getBalance(), orderForm.getReturnedBalance()));
         memberService.save(member);
-        recordReject(member, orderForm.getReturnedMoney(), orderForm.getBalance(), orderForm.getPoint(), orderForm);
+        recordReject(member, orderForm.getReturnedMoney(), orderForm.getReturnedBalance(), orderForm.getReturnedPoint(), orderForm);
     }
 
 

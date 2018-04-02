@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Api(value = "优惠券管理")
@@ -62,7 +63,7 @@ public class CouponController extends AbstractCrudController<Coupon> {
         Member member = memberService.findOne(memberId);
         Integer count = 0;
         for (MemberCoupon memberCoupon : member.getCoupons()) {
-            if(!memberCoupon.getUsed()) {
+            if(!memberCoupon.getUsed() && (memberCoupon.getCoupon().getEndDate() > new Date().getTime())) {
                 count ++;
             }
         }

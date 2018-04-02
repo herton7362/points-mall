@@ -100,7 +100,12 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
                 });
             },
             settlement: function () {
-                window.location.href = utils.patchUrlPrefixUrl('/wechat/orderform/new?id=' + this.cart.id);
+                var selectedIds = [];
+                $.each(this.selectedItems, function() {
+                    selectedIds.push(this.id);
+                });
+                window.location.href = utils.patchUrlPrefixUrl('/wechat/orderform/new?id=' + this.cart.id +
+                    '&items=' + selectedIds.join(','));
             },
             getTotal: function () {
                 var total = 0;
