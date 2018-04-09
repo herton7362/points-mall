@@ -214,13 +214,13 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
                     pay();
                 } else {
                     if(this.payType === 'wechat') {
-                        if(ua.indexOf('Android_WebView') > -1) {
+                        if(ua.indexOf('Android_WebView') > -1 || ua.indexOf('iPhone_WebView') > -1) {
                             wechatAppPay();
                         } else {
                             wechatWebPay();
                         }
                     } else {
-                        if(ua.indexOf('Android_WebView') > -1) {
+                        if(ua.indexOf('Android_WebView') > -1 || ua.indexOf('iPhone_WebView') > -1) {
                             aliAppPay();
                         } else {
                             aliWebPay()
