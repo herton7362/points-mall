@@ -6,6 +6,7 @@ import com.kratos.entity.BaseUser;
 import com.kratos.module.attachment.domain.Attachment;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.List;
@@ -49,6 +50,10 @@ public class Member extends BaseUser {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "member")
     @JsonIgnore
     private List<MemberCoupon> coupons;
+    @ApiModelProperty(value = "会员卡")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "member")
+    @Where(clause="logically_deleted=0")
+    private List<MemberCard> memberCards;
     @ApiModelProperty(value = "头像")
     @ManyToOne
     private Attachment headPhoto;
@@ -143,6 +148,14 @@ public class Member extends BaseUser {
 
     public void setCoupons(List<MemberCoupon> coupons) {
         this.coupons = coupons;
+    }
+
+    public List<MemberCard> getMemberCards() {
+        return memberCards;
+    }
+
+    public void setMemberCards(List<MemberCard> memberCards) {
+        this.memberCards = memberCards;
     }
 
     public Attachment getHeadPhoto() {

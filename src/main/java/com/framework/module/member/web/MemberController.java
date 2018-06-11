@@ -1,6 +1,8 @@
 package com.framework.module.member.web;
 
 import com.framework.module.member.domain.Member;
+import com.framework.module.member.domain.MemberLevel;
+import com.framework.module.member.service.MemberLevelService;
 import com.framework.module.member.service.MemberService;
 import com.kratos.common.AbstractCrudController;
 import com.kratos.common.CrudService;
@@ -20,6 +22,7 @@ import java.util.List;
 @RequestMapping("/api/member")
 public class MemberController extends AbstractCrudController<Member> {
     private final MemberService memberService;
+    private final MemberLevelService memberLevelService;
     @Override
     protected CrudService<Member> getService() {
         return memberService;
@@ -82,8 +85,21 @@ public class MemberController extends AbstractCrudController<Member> {
         return new ResponseEntity<>(memberService.count(), HttpStatus.OK);
     }
 
+    /**
+     * 查询总数
+     */
+    @ApiOperation(value="查询总数")
+    @RequestMapping(value = "/level/{memberId}", method = RequestMethod.GET)
+    public ResponseEntity<MemberLevel> count(@PathVariable String memberId) throws Exception {
+        return new ResponseEntity<>(memberLevelService.getMemberMemberLevel(memberId), HttpStatus.OK);
+    }
+
     @Autowired
-    public MemberController(MemberService memberService) {
+    public MemberController(
+            MemberService memberService,
+            MemberLevelService memberLevelService
+    ) {
         this.memberService = memberService;
+        this.memberLevelService = memberLevelService;
     }
 }

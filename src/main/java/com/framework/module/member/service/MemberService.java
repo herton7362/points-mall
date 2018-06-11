@@ -15,7 +15,7 @@ public interface MemberService extends CrudService<Member> {
      * @param cardNo 会员卡号
      * @return {@link Member}
      */
-    Member findOneByCardNo(String cardNo);
+    Member findOneByCardNo(String cardNo) throws Exception;
 
     /**
      * 快速积分

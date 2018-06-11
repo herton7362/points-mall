@@ -39,6 +39,10 @@ public class OrderForm extends BaseEntity {
     private Double balance;
     @ApiModelProperty(value = "积分支付")
     private Integer point;
+    @ApiModelProperty(value = "折扣")
+    private Double discount;
+    @ApiModelProperty(value = "会员卡")
+    private String memberCardId;
     @ApiModelProperty(value = "订单状态")
     @Column(length = 20)
     @Enumerated(EnumType.STRING)
@@ -131,6 +135,22 @@ public class OrderForm extends BaseEntity {
 
     public void setPoint(Integer point) {
         this.point = point;
+    }
+
+    public Double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Double discount) {
+        this.discount = discount;
+    }
+
+    public String getMemberCardId() {
+        return memberCardId;
+    }
+
+    public void setMemberCardId(String memberCardId) {
+        this.memberCardId = memberCardId;
     }
 
     public OrderStatus getStatus() {

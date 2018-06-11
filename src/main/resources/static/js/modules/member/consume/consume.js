@@ -47,13 +47,15 @@ define([
                 point: null,
                 salePoint: null,
                 address: null,
-                balance: null
+                balance: null,
+                memberCards: []
             },
             payType: [],
             account: {
                 cash: 0,
                 balance: 0,
-                point: 0
+                point: 0,
+                discount: 1
             },
             sidebar: {
                 $instance: {},
@@ -65,7 +67,8 @@ define([
                     alwaysExpended: true
                 },
                 data: []
-            }
+            },
+            selectedCardId: null
         },
         filters: {
             formatMoney: function(val) {
@@ -75,7 +78,7 @@ define([
         watch: {
             'account.balance': function(val, oldVal) {
                 this.account.balance = val || 0;
-                if(parseFloat(val) > this.member.balance) {
+                if(val !== 0 && parseFloat(val) > this.member.balance) {
                     messager.bubble("余额不足");
                     this.account.balance = oldVal;
                 }
@@ -112,12 +115,32 @@ define([
                     }
                 });
             },
+            selectedCardId: function(val) {
+                var memberCards = this.member.memberCards;
+                var card = null;
+                $.each(memberCards, function () {
+                    if(this.id === val) {
+                        card = this;
+                    }
+                });
+                if(card) {
+                    this.account.discount = card.discount;
+                } else {
+                    this.account.discount = 1;
+                }
+
+                this.account.cash = this.getSummary();
+            },
             deep:true
         },
         methods: {
             open: function(member) {
                 var self = this;
                 this.member = member;
+                var memberCards = this.member.memberCards;
+                for (var i = 0; i < memberCards.length; i++) {
+                    memberCards[i].name = memberCards[i].memberCardType.name;
+                }
                 this.modal.$instance.open();
                 this.datagrid.data.splice(0);
                 setTimeout(function() {
@@ -184,7 +207,7 @@ define([
                 $.each(data, function () {
                     total += this.price * this.count;
                 });
-                return total;
+                return utils.formatMoney(total * this.account.discount);
             },
             consumeOpen: function() {
                 var data = this.datagrid.data;
@@ -196,6 +219,8 @@ define([
                 this.account.balance = 0;
                 this.account.point = 0;
                 this.account.cash = total;
+                this.account.discount = 1;
+                this.selectedCardId = null;
                 this._checkPayType('balance');
                 this._checkPayType('point');
                 this.consumeModal.$instance.open()
@@ -230,7 +255,9 @@ define([
                         items: items,
                         cash: this.account.cash,
                         balance: this.account.balance,
-                        point: this.account.point
+                        point: this.account.point,
+                        discount: this.account.discount,
+                        memberCardId: this.selectedCardId
                     }),
                     type: 'POST',
                     success: function() {

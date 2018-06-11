@@ -42,10 +42,6 @@
                     >
                         <template slot="form-body" scope="props">
                             <div class="form-group">
-                                <label>会员卡：</label>
-                                <input type="text" class="form-control" required v-model="props.form.cardNo" placeholder="输入会员卡号">
-                            </div>
-                            <div class="form-group">
                                 <label>名称：</label>
                                 <input type="text" class="form-control" required v-model="props.form.name" placeholder="输入会员名称">
                             </div>
@@ -80,8 +76,79 @@
                                 <label>所在地区：</label>
                                 <input type="text" class="form-control" v-model="props.form.address" placeholder="输入所在地区">
                             </div>
+
+                        </template>
+                        <template slot="datagrid-operator" scope="props">
+                            <a class="btn btn-xs bg-green" @click="editMemberCard(props.row)" title="会员卡"><i class="fa fa-fw fa-credit-card"></i></a>
                         </template>
                     </crudgrid>
+                    <sidemodal title="会员卡维护" :footer="true" :instance="cards.sidemodal">
+                        <template slot="body">
+                            <div class="form-group">
+                                <label>会员卡：</label>
+                                <button type="button"
+                                        class="btn btn-flat btn-success"
+                                        @click="openAddMemberCardModal()">
+                                    <i class="fa fa-pencil"></i> 添加会员卡
+                                </button>
+                                <datagrid
+                                        :operator="true"
+                                        :url="cards.datagrid.url"
+                                        :instance="cards.datagrid"
+                                        :columns="cards.columns"
+                                        :data="cards.sidemodal.form.memberCards"
+                                        :query-params="cards.datagrid.queryParams"
+                                >
+                                    <template slot="operator" scope="props">
+                                        <a class="btn btn-xs bg-green" @click="findMemberCard(props.row)" title="修改"><i class="fa fa-pencil"></i></a>
+                                        <a class="btn btn-xs bg-red" @click="removeMemberCard(props.row, $event)" title="删除"><i class="fa fa-trash"></i></a>
+                                    </template>
+                                </datagrid>
+                            </div>
+                            <!-- /.box-body -->
+                        </template>
+                        <template slot="footer">
+                            <button type="button" class="btn btn-default margin-r-5 btn-flat" @click="cards.sidemodal.$instance.close()">关闭</button>
+                        </template>
+                    </sidemodal>
+                    <validator :instance="cards.validator">
+                        <form @submit.prevent="saveMemberCard">
+                            <modal title="会员卡维护" :footer="true" :instance="cards.modal">
+                                <template slot="body">
+                                    <div class="form-group">
+                                        <label>会员卡号：</label>
+                                        <input type="text" class="form-control" required v-model="cards.form.cardNumber" placeholder="输入会员卡号">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>会员卡类型：</label>
+                                        <div class="radio">
+                                            <label v-for="data in cardType.list">
+                                                <radio :value="data.id" name="cardType" v-model="cards.form.memberCardType.id"></radio> {{data.name}}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>折扣：</label>
+                                        <input type="text" class="form-control" required v-model="cards.form.discount" placeholder="输入折扣">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>过期日期：</label>
+                                        <div class="input-group date">
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-calendar"></i>
+                                            </div>
+                                            <datepicker v-model="cards.form.expireDate"></datepicker>
+                                        </div>
+                                    </div>
+                                    <!-- /.box-body -->
+                                </template>
+                                <template slot="footer">
+                                    <button type="button" class="btn btn-default margin-r-5 btn-flat" @click="cards.modal.$instance.close()">取消编辑</button>
+                                    <button type="submit" class="btn btn-primary btn-flat">保存数据</button>
+                                </template>
+                            </modal>
+                        </form>
+                    </validator>
                 </div>
             </div>
         </section>

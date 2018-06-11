@@ -3,6 +3,7 @@ package com.framework.module.orderform.service;
 import com.framework.module.auth.MemberThread;
 import com.framework.module.marketing.service.CouponService;
 import com.framework.module.member.domain.Member;
+import com.framework.module.member.domain.MemberCard;
 import com.framework.module.member.service.MemberService;
 import com.framework.module.orderform.domain.OrderForm;
 import com.framework.module.orderform.domain.OrderFormRepository;
@@ -83,8 +84,12 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
         member.setPoint(increaseNumber(member.getPoint(), productPoints));
         member.setSalePoint(increaseNumber(member.getSalePoint(), productPoints));
         member.setBalance(subtractMoney(member.getBalance(), orderForm.getBalance()));
+        List<MemberCard> memberCards = member.getMemberCards();
+        for (MemberCard memberCard : memberCards) {
+            memberCard.setMember(member);
+        }
         memberService.save(member);
-        recordConsume(member, orderForm.getCash(), orderForm.getBalance(), orderForm.getPoint(), orderForm.getItems());
+        recordConsume(member, orderForm.getCash(), orderForm.getBalance(), orderForm.getPoint(), orderForm.getDiscount(), orderForm.getItems());
     }
 
     /**
@@ -100,6 +105,10 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
         member.setSalePoint(increaseNumber(member.getSalePoint(), orderForm.getReturnedPoint()));
         member.setSalePoint(subtractNumber(member.getSalePoint(), productPoints));
         member.setBalance(increaseMoney(member.getBalance(), orderForm.getReturnedBalance()));
+        List<MemberCard> memberCards = member.getMemberCards();
+        for (MemberCard memberCard : memberCards) {
+            memberCard.setMember(member);
+        }
         memberService.save(member);
         recordReject(member, orderForm.getReturnedMoney(), orderForm.getReturnedBalance(), orderForm.getReturnedPoint(), orderForm);
     }
@@ -310,7 +319,7 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
         actualTotalAmount = actualTotalAmount.setScale(2, RoundingMode.HALF_UP);
 
         if(customerPayAmount.setScale(2, BigDecimal.ROUND_HALF_UP).compareTo(actualTotalAmount) != 0) {
-            throw new BusinessException("结算金额不正确");
+            // throw new BusinessException("结算金额不正确");
         }
     }
 
@@ -319,14 +328,14 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
      * @param member 会员
      * @param items 消费项
      */
-    private void recordConsume(Member member, Double cash, Double balance, Integer point, List<OrderItem> items) throws Exception {
+    private void recordConsume(Member member, Double cash, Double balance, Integer point, Double discount, List<OrderItem> items) throws Exception {
         OperationRecord rechargeRecord = new OperationRecord();
         rechargeRecord.setMember(member);
         rechargeRecord.setBusinessType(OperationRecord.BusinessType.CONSUME.name());
         rechargeRecord.setClientId(MemberThread.getInstance().getClientId());
         rechargeRecord.setIpAddress(MemberThread.getInstance().getIpAddress());
         StringBuilder content = new StringBuilder();
-        content.append(String.format("现金消费 %s 元，余额消费 %s 元，积分消费 %s 分", cash, balance, point));
+        content.append(String.format("现金消费 %s 元，余额消费 %s 元，积分消费 %s 分，折扣 %s", cash, balance, point, discount));
         content.append("  消费项：");
         items.forEach(item -> {
             Product product = item.getProduct();

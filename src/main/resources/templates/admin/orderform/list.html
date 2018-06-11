@@ -82,6 +82,7 @@
                                         <th>商品名称</th>
                                         <th>销售金额</th>
                                         <th>数量</th>
+                                        <th>折扣</th>
                                         <th>单号</th>
                                         <th style="text-align: center; width: 40px;">状态</th>
                                         <th>创建日期</th>
@@ -104,6 +105,10 @@
                                         <td>
                                             <div class="col-xs-4 cell-title">数量：</div>
                                             {{getProductTotal(row)}}
+                                        </td>
+                                        <td>
+                                            <div class="col-xs-4 cell-title">折扣：</div>
+                                            {{row.discount}}
                                         </td>
                                         <td>
                                             <div class="col-xs-4 cell-title">单号：</div>

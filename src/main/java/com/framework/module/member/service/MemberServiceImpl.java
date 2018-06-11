@@ -1,18 +1,17 @@
 package com.framework.module.member.service;
 
+import com.framework.module.auth.MemberThread;
+import com.framework.module.member.domain.Member;
+import com.framework.module.member.domain.MemberCard;
+import com.framework.module.member.domain.MemberRepository;
+import com.framework.module.record.domain.OperationRecord;
+import com.framework.module.record.service.OperationRecordService;
 import com.kratos.common.AbstractCrudService;
 import com.kratos.common.PageRepository;
 import com.kratos.exceptions.BusinessException;
-import com.framework.module.auth.MemberThread;
-import com.kratos.module.auth.service.OauthClientDetailsService;
-import com.framework.module.member.domain.Member;
-import com.framework.module.member.domain.MemberRepository;
-import com.framework.module.member.service.MemberService;
-import com.framework.module.record.domain.OperationRecord;
-import com.framework.module.record.service.OperationRecordService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,13 +21,15 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component("memberService")
 @Transactional
 public class MemberServiceImpl extends AbstractCrudService<Member> implements MemberService {
     private final MemberRepository repository;
-    private final OauthClientDetailsService oauthClientDetailsService;
+    private final MemberCardService memberCardService;
     private final OperationRecordService operationRecordService;
 
     @Override
@@ -51,8 +52,14 @@ public class MemberServiceImpl extends AbstractCrudService<Member> implements Me
     }
 
     @Override
-    public Member findOneByCardNo(String cardNo) {
-        return repository.findOneByCardNo(cardNo);
+    public Member findOneByCardNo(String cardNo) throws Exception {
+        Map<String, String[]> param = new HashMap<>();
+        param.put("cardNumber", new String[] {cardNo});
+        List<MemberCard> memberCards = memberCardService.findAll(param);
+        if(memberCards != null && !memberCards.isEmpty()) {
+            return memberCards.get(0).getMember();
+        }
+        return null;
     }
 
     @Override
@@ -146,14 +153,15 @@ public class MemberServiceImpl extends AbstractCrudService<Member> implements Me
         return new BigDecimal(sourceMoney).subtract(new BigDecimal(money)).doubleValue();
     }
 
+    @Lazy
     @Autowired
     public MemberServiceImpl(
             MemberRepository repository,
-            OauthClientDetailsService oauthClientDetailsService,
+            MemberCardService memberCardService,
             OperationRecordService operationRecordService
     ) {
         this.repository = repository;
-        this.oauthClientDetailsService = oauthClientDetailsService;
+        this.memberCardService = memberCardService;
         this.operationRecordService = operationRecordService;
     }
 }

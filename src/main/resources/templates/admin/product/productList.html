@@ -92,6 +92,17 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-6" v-if="!hasStandard()">
+                                    <div class="form-group">
+                                        <label>是否允许会员卡消费：</label>
+                                        <div class="radio">
+                                            <radio :value="true" name="memberCardConsume" v-model="props.form.memberCardConsume"></radio> 是
+                                            <radio :value="false" name="memberCardConsume" v-model="props.form.memberCardConsume"></radio> 否
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="form-group" v-for="productStandard in getSelectedProductStandards()">
                                 <label>{{productStandard.name}}：</label>
                                 <div class="checkbox">
