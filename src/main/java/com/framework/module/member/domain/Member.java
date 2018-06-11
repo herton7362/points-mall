@@ -51,8 +51,9 @@ public class Member extends BaseUser {
     @JsonIgnore
     private List<MemberCoupon> coupons;
     @ApiModelProperty(value = "会员卡")
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "member")
+    @OneToMany(mappedBy = "member")
     @Where(clause="logically_deleted=0")
+    @JsonIgnore
     private List<MemberCard> memberCards;
     @ApiModelProperty(value = "头像")
     @ManyToOne

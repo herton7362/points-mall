@@ -76,20 +76,17 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
      */
     private void consumeModifyMemberAccount(OrderForm orderForm) throws Exception {
         Member member = orderForm.getMember();
+        Member oldMember = memberService.findOne(member.getId());
         Integer productPoints = 0;
         for (OrderItem orderItem : orderForm.getItems()) {
             productPoints += orderItem.getProduct().getPoints();
         }
-        member.setSalePoint(subtractNumber(member.getSalePoint(), orderForm.getPoint()));
-        member.setPoint(increaseNumber(member.getPoint(), productPoints));
-        member.setSalePoint(increaseNumber(member.getSalePoint(), productPoints));
-        member.setBalance(subtractMoney(member.getBalance(), orderForm.getBalance()));
-        List<MemberCard> memberCards = member.getMemberCards();
-        for (MemberCard memberCard : memberCards) {
-            memberCard.setMember(member);
-        }
-        memberService.save(member);
-        recordConsume(member, orderForm.getCash(), orderForm.getBalance(), orderForm.getPoint(), orderForm.getDiscount(), orderForm.getItems());
+        oldMember.setSalePoint(subtractNumber(member.getSalePoint(), orderForm.getPoint()));
+        oldMember.setPoint(increaseNumber(member.getPoint(), productPoints));
+        oldMember.setSalePoint(increaseNumber(member.getSalePoint(), productPoints));
+        oldMember.setBalance(subtractMoney(member.getBalance(), orderForm.getBalance()));
+        memberService.save(oldMember);
+        recordConsume(oldMember, orderForm.getCash(), orderForm.getBalance(), orderForm.getPoint(), orderForm.getDiscount(), orderForm.getItems());
     }
 
     /**
@@ -98,19 +95,16 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
      */
     private void rejectModifyMemberAccount(OrderForm orderForm) throws Exception {
         Member member = orderForm.getMember();
+        Member oldMember = memberService.findOne(member.getId());
         Integer productPoints = 0;
         for (OrderItem orderItem : orderForm.getItems()) {
             productPoints += orderItem.getProduct().getPoints();
         }
-        member.setSalePoint(increaseNumber(member.getSalePoint(), orderForm.getReturnedPoint()));
-        member.setSalePoint(subtractNumber(member.getSalePoint(), productPoints));
-        member.setBalance(increaseMoney(member.getBalance(), orderForm.getReturnedBalance()));
-        List<MemberCard> memberCards = member.getMemberCards();
-        for (MemberCard memberCard : memberCards) {
-            memberCard.setMember(member);
-        }
-        memberService.save(member);
-        recordReject(member, orderForm.getReturnedMoney(), orderForm.getReturnedBalance(), orderForm.getReturnedPoint(), orderForm);
+        oldMember.setSalePoint(increaseNumber(member.getSalePoint(), orderForm.getReturnedPoint()));
+        oldMember.setSalePoint(subtractNumber(member.getSalePoint(), productPoints));
+        oldMember.setBalance(increaseMoney(member.getBalance(), orderForm.getReturnedBalance()));
+        memberService.save(oldMember);
+        recordReject(oldMember, orderForm.getReturnedMoney(), orderForm.getReturnedBalance(), orderForm.getReturnedPoint(), orderForm);
     }
 
 

@@ -137,10 +137,17 @@ define([
             open: function(member) {
                 var self = this;
                 this.member = member;
-                var memberCards = this.member.memberCards;
-                for (var i = 0; i < memberCards.length; i++) {
-                    memberCards[i].name = memberCards[i].memberCardType.name;
-                }
+                $.ajax({
+                    url: utils.patchUrl('/api/memberCard'),
+                    data: {
+                        logicallyDeleted: 0
+                    }
+                }).then(function (memberCards) {
+                    for (var i = 0; i < memberCards.length; i++) {
+                        memberCards[i].name = memberCards[i].memberCardType.name;
+                    }
+                    self.member.memberCards = memberCards;
+                });
                 this.modal.$instance.open();
                 this.datagrid.data.splice(0);
                 setTimeout(function() {
