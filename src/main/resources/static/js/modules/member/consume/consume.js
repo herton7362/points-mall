@@ -140,7 +140,8 @@ define([
                 $.ajax({
                     url: utils.patchUrl('/api/memberCard'),
                     data: {
-                        logicallyDeleted: 0
+                        logicallyDeleted: 0,
+                        'member.id': member.id
                     }
                 }).then(function (memberCards) {
                     for (var i = 0; i < memberCards.length; i++) {

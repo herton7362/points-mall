@@ -43,7 +43,9 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
                 balance: null,
                 point: null
             },
-            hashchanged: false
+            hashchanged: false,
+            memberCards: [],
+            selectedMemberCardId: null
         },
         filters: {
             coverPath: function (val) {
@@ -73,6 +75,16 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
                     this.value = this.id;
                 });
                 return val;
+            },
+            selectedMemberCardId: function (val) {
+                var memberCard = null;
+                $.each(this.memberCards, function () {
+                    if(this.id === val)  {
+                        memberCard = this;
+                    }
+                });
+                this.account.balance = null;
+                this.account.point = null;
             }
         },
         methods: {
@@ -89,7 +101,18 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
                 $.each(this.orderForm.items, function () {
                     total += this.product.price * this.count;
                 });
-                return total;
+                var memberCard = null;
+                var self = this;
+                var discount = 1;
+                $.each(this.memberCards, function () {
+                    if(this.id === self.selectedMemberCardId)  {
+                        memberCard = this;
+                    }
+                });
+                if(memberCard) {
+                    discount = memberCard.discount;
+                }
+                return total * discount;
             },
             getFinalTotal: function () {
                 var total = this.getTotal();
@@ -101,7 +124,10 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
                 if(this.account.balance) {
                     balance = this.account.balance;
                 }
-                return total - this.orderForm.coupon.amount - point - balance;
+                return parseFloat(total).toFixed(2)
+                    - parseFloat((this.orderForm.coupon && this.orderForm.coupon.amount)||0).toFixed(2)
+                    - parseFloat(point).toFixed(2)
+                    - parseFloat(balance).toFixed(2);
             },
             editAddress: function (row) {
                 this.newAddressActionsheet.$instance.open();
@@ -243,7 +269,8 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
                             member: self.member,
                             cash: self.account.cash,
                             balance: self.account.balance || 0,
-                            point: self.account.point || 0
+                            point: self.account.point || 0,
+                            memberCardId: self.selectedMemberCardId
                         })),
                         type: 'POST',
                         success: function(orderForm) {
@@ -321,7 +348,7 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
             },
             confirmPoint: function () {
                 var total = this.getFinalTotal();
-                if(total < (this.account.point / 100)) {
+                if(total < 0) {
                     messager.bubble("积分大于商品价格，请重新填写积分");
                     this.account.point = null;
                     return;
@@ -336,7 +363,7 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
             selectBalance: function () {
                 this.balanceSelector.open = true;
             },
-            useBalance:function (balance) {
+            _useBalance: function(balance) {
                 if(balance > this.member.balance) {
                     messager.bubble('余额不足');
                     return;
@@ -345,6 +372,9 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
                     balance = this.getTotal();
                 }
                 this.account.balance = balance;
+            },
+            useBalance:function (balance) {
+                this._useBalance(balance);
                 window.history.go(-1);
             },
             otherBalance: function () {
@@ -370,6 +400,21 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
             },
             onActionsheetClose: function () {
                 $('body').css('position', 'static');
+            },
+            loadMemberCards: function () {
+                var self = this;
+                $.ajax({
+                    url: utils.patchUrl('/api/memberCard'),
+                    data: {
+                        logicallyDeleted: 0,
+                        'member.id': this.member.id
+                    }
+                }).then(function (memberCards) {
+                    for (var i = 0; i < memberCards.length; i++) {
+                        memberCards[i].name = memberCards[i].memberCardType.name;
+                    }
+                    self.memberCards = memberCards;
+                });
             }
         },
         mounted: function () {
@@ -380,6 +425,7 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
                 self.member = member;
                 self.loadMemberAddress();
                 self.loadCouponCount();
+                self.loadMemberCards();
             });
             $(window).on('hashchange', function () {
                 var isBackward = location.hash.indexOf('#') < 0;

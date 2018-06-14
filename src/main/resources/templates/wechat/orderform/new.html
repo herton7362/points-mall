@@ -53,7 +53,7 @@
                         <div class="weui-cell__bd">
                             <p>
                                 <i class="iconfont icon-store" style="font-size: 18px;"></i>
-                                蹄铁商城
+                                积分商城
                             </p>
                         </div>
                     </div>
@@ -102,6 +102,27 @@
                         </div>
                     </div>
                 </div>
+                <div class="weui-cells__title" v-if="memberCards.length > 0">会员卡</div>
+                <div class="weui-cells weui-cells_radio" v-if="memberCards.length > 0">
+                    <label class="weui-cell weui-check__label" v-for="memberCard in memberCards">
+                        <div class="weui-cell__bd">
+                            <p>{{memberCard.name}}({{memberCard.cardNumber}}) {{memberCard.discount}} 折</p>
+                        </div>
+                        <div class="weui-cell__ft">
+                            <input type="radio" class="weui-check" name="memberCard" v-model="selectedMemberCardId" :value="memberCard.id">
+                            <span class="weui-icon-checked"></span>
+                        </div>
+                    </label>
+                    <label class="weui-cell weui-check__label">
+                        <div class="weui-cell__bd">
+                            <p style="color: #999">不使用会员卡</p>
+                        </div>
+                        <div class="weui-cell__ft">
+                            <input type="radio" class="weui-check" name="memberCard" v-model="selectedMemberCardId" :value="null">
+                            <span class="weui-icon-checked"></span>
+                        </div>
+                    </label>
+                </div>
                 <div class="weui-cells">
                     <a href="#content" class="weui-cell" :class="{'weui-cell_access':coupons.length > 0}" @click="selectCoupon">
                         <div class="weui-cell__bd">
@@ -148,7 +169,7 @@
                         </div>
                         <div class="weui-cell__ft">
                             <template v-if="account.balance">
-                                - ￥{{account.balance}}
+                                - ￥{{account.balance | price}}
                             </template>
                             <template v-if="member.balance > 0 && !account.balance">
                                 使用余额
@@ -159,6 +180,7 @@
                         </div>
                     </a>
                 </div>
+
                 <div class="weui-cells">
                     <div class="weui-cell">
                         <div class="weui-cell__hd">

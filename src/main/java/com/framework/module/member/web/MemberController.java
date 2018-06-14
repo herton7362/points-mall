@@ -42,6 +42,16 @@ public class MemberController extends AbstractCrudController<Member> {
      * 快速积分
      */
     @ApiOperation(value="快速积分")
+    @RequestMapping(value = "/editPwd", method = RequestMethod.POST)
+    public ResponseEntity<?> editPwd(@RequestBody Member member) throws Exception {
+        memberService.editPwd(member);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * 快速积分
+     */
+    @ApiOperation(value="快速积分")
     @RequestMapping(value = "/fastIncreasePoint", method = RequestMethod.POST)
     public ResponseEntity<?> fastIncreasePoint(@RequestBody FastIncreasePointParam param) throws Exception {
         memberService.fastIncreasePoint(param.getMemberId(), param.getPoint());

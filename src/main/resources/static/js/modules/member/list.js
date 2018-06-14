@@ -47,9 +47,7 @@ require(['jquery', 'vue', 'messager', 'utils'], function($, Vue, messager, utils
                 },
                 sidemodal: {
                     $instance: {},
-                    form: {
-                        memberCards: []
-                    }
+                    memberCards: []
                 },
                 datagrid: {
                     $instance: {},
@@ -77,7 +75,8 @@ require(['jquery', 'vue', 'messager', 'utils'], function($, Vue, messager, utils
                 birthday: null,
                 idCard: null,
                 address: null
-            }
+            },
+            selectedMember: {}
         },
         methods: {
             openAddMemberCardModal: function () {
@@ -105,18 +104,13 @@ require(['jquery', 'vue', 'messager', 'utils'], function($, Vue, messager, utils
                     type: 'POST',
                     dataType: 'JSON',
                     data: JSON.stringify($.extend(this.cards.form, {
-                        member: self.cards.sidemodal.form,
+                        member: this.selectedMember,
                         memberCardType: cardType
                     })),
                     success: function() {
                         self.cards.modal.$instance.close();
                         messager.bubble('保存成功！');
-                        $.ajax({
-                            url: utils.patchUrl('/api/member/' + self.cards.sidemodal.form.id),
-                            success: function(data) {
-                                self.cards.sidemodal.form = data;
-                            }
-                        });
+                        self.editMemberCard(self.selectedMember);
                     }
                 })
             },
@@ -133,12 +127,16 @@ require(['jquery', 'vue', 'messager', 'utils'], function($, Vue, messager, utils
             },
             editMemberCard: function (row) {
                 var self = this;
+                this.selectedMember = row;
                 $.ajax({
-                    url: utils.patchUrl('/api/member/' + row.id),
-                    success: function(data) {
-                        self.cards.sidemodal.form = data;
-                        self.cards.sidemodal.$instance.open();
+                    url: utils.patchUrl('/api/memberCard'),
+                    data: {
+                        logicallyDeleted: 0,
+                        'member.id': row.id
                     }
+                }).then(function (memberCards) {
+                    self.cards.sidemodal.memberCards = memberCards;
+                    self.cards.sidemodal.$instance.open();
                 });
             },
             removeMemberCard: function(row, event) {
@@ -169,9 +167,6 @@ require(['jquery', 'vue', 'messager', 'utils'], function($, Vue, messager, utils
                         self.cardType.list = data;
                     }
                 })
-            },
-            cardTypeChange: function (val) {
-                console.log(val)
             }
         },
         mounted: function() {

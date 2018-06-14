@@ -736,6 +736,11 @@
     color: #333;
 }
 
+.orderform-list .total-price.deleted {
+    color: #999;
+    text-decoration-line: line-through;
+}
+
 .orderform-list.product-list .product-item {
     background-color: transparent;
 }

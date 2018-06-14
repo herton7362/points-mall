@@ -35,10 +35,10 @@
             <div class="row">
                 <div class="col-md-12">
                     <crudgrid
-                            domain="member"
-                            :columns="crudgrid.columns"
-                            :form-data="formData"
-                            :instance="crudgrid"
+                        domain="member"
+                        :columns="crudgrid.columns"
+                        :form-data="formData"
+                        :instance="crudgrid"
                     >
                         <template slot="form-body" scope="props">
                             <div class="form-group">
@@ -96,7 +96,7 @@
                                         :url="cards.datagrid.url"
                                         :instance="cards.datagrid"
                                         :columns="cards.columns"
-                                        :data="cards.sidemodal.form.memberCards"
+                                        :data="cards.sidemodal.memberCards"
                                         :query-params="cards.datagrid.queryParams"
                                 >
                                     <template slot="operator" scope="props">

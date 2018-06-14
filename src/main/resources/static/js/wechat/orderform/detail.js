@@ -7,7 +7,9 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
             orderForm: {
                 deliverToAddress: {}
             },
-            orderStatus: []
+            orderStatus: [],
+            member: {},
+            memberCards: []
         },
         filters: {
             coverPath: function (val) {
@@ -51,7 +53,18 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
                 $.each(this.orderItems, function () {
                     total += this.product.price * this.count;
                 });
-                return total;
+                var memberCard = null;
+                var self = this;
+                var discount = 1;
+                $.each(this.memberCards, function () {
+                    if(this.id === self.orderForm.memberCardId)  {
+                        memberCard = this;
+                    }
+                });
+                if(memberCard) {
+                    discount = memberCard.discount;
+                }
+                return total * discount;
             },
             loadOrderForm: function () {
                 var self = this;
@@ -62,11 +75,30 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
                         self.orderForm = data;
                     }
                 })
+            },
+            loadMemberCards: function () {
+                var self = this;
+                $.ajax({
+                    url: utils.patchUrl('/api/memberCard'),
+                    data: {
+                        logicallyDeleted: 0,
+                        'member.id': this.member.id
+                    }
+                }).then(function (memberCards) {
+                    for (var i = 0; i < memberCards.length; i++) {
+                        memberCards[i].name = memberCards[i].memberCardType.name;
+                    }
+                    self.memberCards = memberCards;
+                });
             }
         },
         mounted: function () {
             var self = this;
-            this.loadOrderForm();
+            utils.getLoginMember(function (member) {
+                self.member = member;
+                self.loadMemberCards();
+                self.loadOrderForm();
+            });
             $.ajax({
                 url: utils.patchUrl('/api/orderForm/status'),
                 success: function (data) {

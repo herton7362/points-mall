@@ -43,4 +43,10 @@ public interface MemberService extends CrudService<Member> {
      * @return 会员总数
      */
     Long count();
+
+    /**
+     * 修改密码
+     * @param member 会员参数
+     */
+    void editPwd(Member member) throws Exception;
 }

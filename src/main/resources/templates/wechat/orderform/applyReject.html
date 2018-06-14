@@ -47,6 +47,19 @@
                     </div>
                 </div>
 
+                <div class="weui-cells__title" v-if="orderForm.memberCardId">会员卡</div>
+                <div class="weui-cells weui-cells_radio" v-if="orderForm.memberCardId">
+                    <label class="weui-cell weui-check__label" v-for="memberCard in memberCards" v-if="orderForm.memberCardId == memberCard.id">
+                        <div class="weui-cell__bd">
+                            <p>{{memberCard.name}}({{memberCard.cardNumber}}) {{memberCard.discount}} 折</p>
+                        </div>
+                        <div class="weui-cell__ft">
+                            <input type="radio" class="weui-check" name="memberCard" checked>
+                            <span class="weui-icon-checked"></span>
+                        </div>
+                    </label>
+                </div>
+
                 <div class="weui-cells">
                     <div class="weui-cell">
                         <div class="weui-cell__bd">

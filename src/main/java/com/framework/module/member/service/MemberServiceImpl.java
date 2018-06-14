@@ -12,6 +12,7 @@ import com.kratos.exceptions.BusinessException;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -130,6 +131,16 @@ public class MemberServiceImpl extends AbstractCrudService<Member> implements Me
                 return criteriaBuilder.and(predicate.toArray(new Predicate[]{}));
             }
         );
+    }
+
+    @Override
+    public void editPwd(Member member) throws Exception {
+        if(StringUtils.isBlank(member.getId())) {
+            throw new BusinessException("会员id不能为空");
+        }
+        Member old = repository.findOne(member.getId());
+        old.setPassword(new BCryptPasswordEncoder().encode(member.getPassword()));
+        super.save(old);
     }
 
     private Integer increaseNumber(Integer sourcePoint, Integer point) {

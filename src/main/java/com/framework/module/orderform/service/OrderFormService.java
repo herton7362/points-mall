@@ -2,9 +2,12 @@ package com.framework.module.orderform.service;
 
 import com.framework.module.orderform.domain.OrderForm;
 import com.framework.module.orderform.web.ApplyRejectParam;
+import com.framework.module.orderform.web.OrderFormResult;
 import com.framework.module.orderform.web.RejectParam;
 import com.framework.module.orderform.web.SendOutParam;
 import com.kratos.common.CrudService;
+import com.kratos.common.PageResult;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -76,4 +79,8 @@ public interface OrderFormService extends CrudService<OrderForm> {
      * @param outTradeNo 订单id
      */
     void payed(String outTradeNo) throws Exception;
+
+    PageResult<OrderFormResult> findAllTranslated(PageRequest pageRequest, Map<String, String[]> param) throws Exception;
+
+    List<OrderFormResult> findAllTranslated(Map<String, String[]> param) throws Exception;
 }

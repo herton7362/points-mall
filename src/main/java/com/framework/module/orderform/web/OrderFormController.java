@@ -4,6 +4,8 @@ import com.framework.module.orderform.domain.OrderForm;
 import com.framework.module.orderform.service.OrderFormService;
 import com.kratos.common.AbstractCrudController;
 import com.kratos.common.CrudService;
+import com.kratos.common.PageParam;
+import com.kratos.common.PageResult;
 import com.kratos.kits.alipay.AliPayAPI;
 import com.kratos.kits.alipay.AliPayResult;
 import com.kratos.kits.wechat.WeChatAPI;
@@ -31,6 +33,16 @@ public class OrderFormController extends AbstractCrudController<OrderForm> {
     @Override
     protected CrudService<OrderForm> getService() {
         return orderFormService;
+    }
+
+    public ResponseEntity<?> searchPagedList(@ModelAttribute PageParam pageParam, HttpServletRequest request) throws Exception {
+        Map<String, String[]> param = request.getParameterMap();
+        if(pageParam.isPageAble()) {
+            PageResult<OrderFormResult> page = orderFormService.findAllTranslated(pageParam.getPageRequest(), param);
+            return new ResponseEntity<>(page, HttpStatus.OK);
+        }
+        List<OrderFormResult> list = orderFormService.findAllTranslated(param);
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     /**

@@ -4,11 +4,13 @@ import com.framework.module.auth.MemberThread;
 import com.framework.module.marketing.service.CouponService;
 import com.framework.module.member.domain.Member;
 import com.framework.module.member.domain.MemberCard;
+import com.framework.module.member.service.MemberCardService;
 import com.framework.module.member.service.MemberService;
 import com.framework.module.orderform.domain.OrderForm;
 import com.framework.module.orderform.domain.OrderFormRepository;
 import com.framework.module.orderform.domain.OrderItem;
 import com.framework.module.orderform.web.ApplyRejectParam;
+import com.framework.module.orderform.web.OrderFormResult;
 import com.framework.module.orderform.web.RejectParam;
 import com.framework.module.orderform.web.SendOutParam;
 import com.framework.module.product.domain.Product;
@@ -19,10 +21,13 @@ import com.framework.module.record.domain.OperationRecord;
 import com.framework.module.record.service.OperationRecordService;
 import com.kratos.common.AbstractCrudService;
 import com.kratos.common.PageRepository;
+import com.kratos.common.PageResult;
 import com.kratos.exceptions.BusinessException;
 import com.kratos.module.auth.service.OauthClientDetailsService;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +44,7 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
     private final OperationRecordService operationRecordService;
     private final ProductRepository productRepository;
     private final CouponService couponService;
+    private final MemberCardService memberCardService;
 
     @Override
     protected PageRepository<OrderForm> getRepository() {
@@ -268,6 +274,38 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
         }
     }
 
+    @Override
+    public PageResult<OrderFormResult> findAllTranslated(PageRequest pageRequest, Map<String, String[]> param) throws Exception {
+        PageResult<OrderForm> page = findAll(pageRequest, param);
+        PageResult<OrderFormResult> pageResult = new PageResult<>();
+        pageResult.setSize(page.getSize());
+        pageResult.setTotalElements(page.getTotalElements());
+        pageResult.setContent(translateResults(page.getContent()));
+        return pageResult;
+    }
+
+    @Override
+    public List<OrderFormResult> findAllTranslated(Map<String, String[]> param) throws Exception {
+        return translateResults(super.findAll(param));
+    }
+
+    private List<OrderFormResult> translateResults(List<OrderForm> orderForms) throws Exception {
+        List<OrderFormResult> orderFormResults = new ArrayList<>();
+        for (OrderForm orderForm : orderForms) {
+            orderFormResults.add(this.translateResult(orderForm));
+        }
+        return orderFormResults;
+    }
+
+    private OrderFormResult translateResult(OrderForm orderForm) throws Exception {
+        OrderFormResult orderFormResult = new OrderFormResult();
+        BeanUtils.copyProperties(orderForm, orderFormResult);
+        if(StringUtils.isNotBlank(orderForm.getMemberCardId())) {
+            orderFormResult.setMemberCard(memberCardService.findOne(orderForm.getMemberCardId()));
+        }
+        return orderFormResult;
+    }
+
     /**
      * 要求外部订单号必须唯一。
      * @return 订单号
@@ -396,12 +434,14 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
             MemberService memberService,
             OperationRecordService operationRecordService,
             ProductRepository productRepository,
-            CouponService couponService
+            CouponService couponService,
+            MemberCardService memberCardService
     ) {
         this.orderFormRepository = orderFormRepository;
         this.memberService = memberService;
         this.operationRecordService = operationRecordService;
         this.productRepository = productRepository;
         this.couponService = couponService;
+        this.memberCardService = memberCardService;
     }
 }

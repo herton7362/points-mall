@@ -62,12 +62,23 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
                     }
                 })
             },
-            getTotal: function (orderItems) {
+            getTotal: function (orderItems, orderForm) {
                 var total = 0;
                 $.each(orderItems, function () {
                     total += this.product.price * this.count;
                 });
                 return total;
+            },
+            getDiscountedTotal: function (orderItems, orderForm) {
+                var total = 0;
+                $.each(orderItems, function () {
+                    total += this.product.price * this.count;
+                });
+                var discount = 1;
+                if(orderForm.memberCard) {
+                    discount = orderForm.memberCard.discount;
+                }
+                return total * discount;
             },
             getAmount: function (orderItems) {
                 var amount = 0;

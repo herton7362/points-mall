@@ -55,7 +55,18 @@
                             <div class="weui-cell weui-cell_link">
                                 <div class="weui-cell__bd"></div>
                                 <div class="weui-cell__ft">
-                                    共 {{getAmount(orderForm.items)}} 件商品 合计 <span class="total-price">￥{{getTotal(orderForm.items) | price}}</span>
+                                    <div>
+                                        <span v-if="orderForm.memberCardId">
+                                            {{orderForm.memberCard.memberCardType.name}} {{orderForm.memberCard.discount}} 折
+                                        </span>
+                                    </div>
+                                    共 {{getAmount(orderForm.items)}} 件商品 合计
+                                    <span class="total-price deleted" v-if="orderForm.memberCardId">
+                                        ￥{{getTotal(orderForm.items) | price}}
+                                    </span>
+                                    <span class="total-price" :style="orderForm.memberCardId? 'display: block' : ''">
+                                        ￥{{getDiscountedTotal(orderForm.items, orderForm) | price}}
+                                    </span>
                                     <p class="operators">
                                         <button type="button"
                                                 class="weui-btn weui-btn_mini weui-btn_primary"
