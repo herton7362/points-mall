@@ -23,7 +23,7 @@ public class MemberCardServiceImpl extends AbstractCrudService<MemberCard> imple
     }
 
     @Override
-    public MemberCard save(MemberCard memberCard) throws Exception {
+    public MemberCard save(MemberCard memberCard) {
         Member member = memberService.findOneByCardNo(memberCard.getCardNumber());
         if(member != null && ((StringUtils.isBlank(memberCard.getId())
                 && memberCard.getMember().getId().equals(member.getId())) ||

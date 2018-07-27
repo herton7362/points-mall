@@ -3,7 +3,6 @@ package com.framework.module.orderform.service;
 import com.framework.module.auth.MemberThread;
 import com.framework.module.marketing.service.CouponService;
 import com.framework.module.member.domain.Member;
-import com.framework.module.member.domain.MemberCard;
 import com.framework.module.member.service.MemberCardService;
 import com.framework.module.member.service.MemberService;
 import com.framework.module.orderform.domain.OrderForm;
@@ -15,15 +14,12 @@ import com.framework.module.orderform.web.RejectParam;
 import com.framework.module.orderform.web.SendOutParam;
 import com.framework.module.product.domain.Product;
 import com.framework.module.product.domain.ProductRepository;
-import com.framework.module.product.domain.Sku;
-import com.framework.module.product.service.ProductService;
 import com.framework.module.record.domain.OperationRecord;
 import com.framework.module.record.service.OperationRecordService;
 import com.kratos.common.AbstractCrudService;
 import com.kratos.common.PageRepository;
 import com.kratos.common.PageResult;
 import com.kratos.exceptions.BusinessException;
-import com.kratos.module.auth.service.OauthClientDetailsService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +48,7 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
     }
 
     @Override
-    public OrderForm makeOrder(OrderForm orderForm) throws Exception {
+    public OrderForm makeOrder(OrderForm orderForm) {
         Member member = orderForm.getMember();
         if(member == null) {
             throw new BusinessException("下单账户未找到");
@@ -80,7 +76,7 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
      * 消费修改账户余额
      * @param orderForm 订单
      */
-    private void consumeModifyMemberAccount(OrderForm orderForm) throws Exception {
+    private void consumeModifyMemberAccount(OrderForm orderForm) {
         Member member = orderForm.getMember();
         Member oldMember = memberService.findOne(member.getId());
         Integer productPoints = 0;
@@ -99,7 +95,7 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
      * 退款修改账户余额
      * @param orderForm 订单
      */
-    private void rejectModifyMemberAccount(OrderForm orderForm) throws Exception {
+    private void rejectModifyMemberAccount(OrderForm orderForm) {
         Member member = orderForm.getMember();
         Member oldMember = memberService.findOne(member.getId());
         Integer productPoints = 0;
@@ -115,7 +111,7 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
 
 
     @Override
-    public Map<String, Integer> getOrderCounts(String memberId) throws Exception {
+    public Map<String, Integer> getOrderCounts(String memberId) {
         OrderForm.OrderStatus[] orderStatuses = OrderForm.OrderStatus.values();
         Map<String, Integer> result = new HashMap<>();
         for (OrderForm.OrderStatus orderStatus : orderStatuses) {
@@ -125,7 +121,7 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
     }
 
     @Override
-    public OrderForm pay(OrderForm orderForm) throws Exception {
+    public OrderForm pay(OrderForm orderForm) {
         if(orderForm == null) {
             throw new BusinessException("订单未找到");
         }
@@ -142,7 +138,7 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
     }
 
     @Override
-    public OrderForm saveShippingInfo(SendOutParam sendOutParam) throws Exception {
+    public OrderForm saveShippingInfo(SendOutParam sendOutParam) {
         OrderForm orderForm = orderFormRepository.findOne(sendOutParam.getId());
         if(orderForm == null) {
             throw new BusinessException("订单未找到");
@@ -167,7 +163,7 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
     }
 
     @Override
-    public OrderForm receive(String id) throws Exception {
+    public OrderForm receive(String id) {
         OrderForm orderForm = orderFormRepository.findOne(id);
         if(orderForm == null) {
             throw new BusinessException("订单未找到");
@@ -185,7 +181,7 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
     }
 
     @Override
-    public OrderForm applyReject(ApplyRejectParam applyRejectParam) throws Exception {
+    public OrderForm applyReject(ApplyRejectParam applyRejectParam) {
         OrderForm orderForm = orderFormRepository.findOne(applyRejectParam.getId());
         if(orderForm == null) {
             throw new BusinessException("订单未找到");
@@ -205,7 +201,7 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
     }
 
     @Override
-    public OrderForm reject(RejectParam rejectParam) throws Exception {
+    public OrderForm reject(RejectParam rejectParam) {
         OrderForm orderForm = orderFormRepository.findOne(rejectParam.getId());
         if(orderForm == null) {
             throw new BusinessException("订单未找到");
@@ -225,17 +221,17 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
     }
 
     @Override
-    public Double getTodaySale() throws Exception {
+    public Double getTodaySale() {
         return orderFormRepository.getTodaySale();
     }
 
     @Override
-    public Double getMonthSale() throws Exception {
+    public Double getMonthSale() {
         return orderFormRepository.getMonthSale();
     }
 
     @Override
-    public List<Map<String, Object>> getEverydaySale() throws Exception {
+    public List<Map<String, Object>> getEverydaySale() {
         List<Map<String, Object>> result = new ArrayList<>();
         Map<String, Object> map;
         Calendar startDate = Calendar.getInstance();
@@ -261,7 +257,7 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
     }
 
     @Override
-    public void payed(String outTradeNo) throws Exception {
+    public void payed(String outTradeNo) {
         Map<String, String[]> param = new HashMap<>();
         param.put("orderNumber", new String[]{outTradeNo});
         List<OrderForm> orderForms = findAll(param);
@@ -275,7 +271,7 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
     }
 
     @Override
-    public PageResult<OrderFormResult> findAllTranslated(PageRequest pageRequest, Map<String, String[]> param) throws Exception {
+    public PageResult<OrderFormResult> findAllTranslated(PageRequest pageRequest, Map<String, String[]> param) {
         PageResult<OrderForm> page = findAll(pageRequest, param);
         PageResult<OrderFormResult> pageResult = new PageResult<>();
         pageResult.setSize(page.getSize());
@@ -285,11 +281,11 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
     }
 
     @Override
-    public List<OrderFormResult> findAllTranslated(Map<String, String[]> param) throws Exception {
+    public List<OrderFormResult> findAllTranslated(Map<String, String[]> param) {
         return translateResults(super.findAll(param));
     }
 
-    private List<OrderFormResult> translateResults(List<OrderForm> orderForms) throws Exception {
+    private List<OrderFormResult> translateResults(List<OrderForm> orderForms) {
         List<OrderFormResult> orderFormResults = new ArrayList<>();
         for (OrderForm orderForm : orderForms) {
             orderFormResults.add(this.translateResult(orderForm));
@@ -297,7 +293,7 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
         return orderFormResults;
     }
 
-    private OrderFormResult translateResult(OrderForm orderForm) throws Exception {
+    private OrderFormResult translateResult(OrderForm orderForm) {
         OrderFormResult orderFormResult = new OrderFormResult();
         BeanUtils.copyProperties(orderForm, orderFormResult);
         if(StringUtils.isNotBlank(orderForm.getMemberCardId())) {
@@ -328,7 +324,7 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
      * @param orderForm 订单对象
      * @throws Exception {@link com.kratos.exceptions.BusinessException}逻辑异常
      */
-    private void validAccount(OrderForm orderForm) throws Exception {
+    private void validAccount(OrderForm orderForm) {
         BigDecimal balance = new BigDecimal(orderForm.getBalance()).setScale(2, RoundingMode.HALF_UP);
         BigDecimal cash = new BigDecimal(orderForm.getCash()).setScale(2, RoundingMode.HALF_UP);
         BigDecimal point = new BigDecimal(orderForm.getPoint());
@@ -360,7 +356,7 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
      * @param member 会员
      * @param items 消费项
      */
-    private void recordConsume(Member member, Double cash, Double balance, Integer point, Double discount, List<OrderItem> items) throws Exception {
+    private void recordConsume(Member member, Double cash, Double balance, Integer point, Double discount, List<OrderItem> items) {
         OperationRecord rechargeRecord = new OperationRecord();
         rechargeRecord.setMember(member);
         rechargeRecord.setBusinessType(OperationRecord.BusinessType.CONSUME.name());
@@ -386,7 +382,7 @@ public class OrderFormServiceImpl extends AbstractCrudService<OrderForm> impleme
      * @param member 会员
      * @param orderForm 订单实体
      */
-    private void recordReject(Member member, Double cash, Double balance, Integer point, OrderForm orderForm) throws Exception {
+    private void recordReject(Member member, Double cash, Double balance, Integer point, OrderForm orderForm) {
         OperationRecord rechargeRecord = new OperationRecord();
         rechargeRecord.setMember(member);
         rechargeRecord.setBusinessType(OperationRecord.BusinessType.REJECT.name());

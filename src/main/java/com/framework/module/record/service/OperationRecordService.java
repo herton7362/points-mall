@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface OperationRecordService extends CrudService<OperationRecord> {
-    PageResult<OperationRecordResult> findAllTranslated(PageRequest pageRequest, Map<String, String[]> param) throws Exception;
+    PageResult<OperationRecordResult> findAllTranslated(PageRequest pageRequest, Map<String, String[]> param);
 
-    List<OperationRecordResult> findAllTranslated(Map<String, String[]> param) throws Exception;
+    List<OperationRecordResult> findAllTranslated(Map<String, String[]> param);
 }

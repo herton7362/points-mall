@@ -31,7 +31,7 @@ public class CartServiceImpl extends AbstractCrudService<Cart> implements CartSe
     }
 
     @Override
-    public void addProduct(final Cart cart) throws Exception {
+    public void addProduct(final Cart cart) {
         if(cart.getMember() == null || StringUtils.isBlank(cart.getMember().getId())) {
             throw new BusinessException("会员不能为空");
         }
@@ -91,7 +91,7 @@ public class CartServiceImpl extends AbstractCrudService<Cart> implements CartSe
     }
 
     @Override
-    public void delete(String id) throws Exception {
+    public void delete(String id) {
         cartRepository.delete(id);
     }
 

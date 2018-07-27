@@ -19,8 +19,8 @@ require(['jquery', 'vue', 'utils', 'weui', 'messager'], function ($, Vue, utils,
         },
         methods: {
             getHeadPhoto: function () {
-                if(this.member.headPhoto) {
-                    return utils.patchUrl('/attachment/download/' + this.member.headPhoto.id);
+                if(this.member.headPhotoId) {
+                    return utils.patchUrl('/attachment/download/' + this.member.headPhotoId);
                 } else {
                     return window._appConf.ctx + '/static/image/default_user.jpg';
                 }

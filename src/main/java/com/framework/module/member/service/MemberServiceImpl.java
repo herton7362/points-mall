@@ -34,7 +34,7 @@ public class MemberServiceImpl extends AbstractCrudService<Member> implements Me
     private final OperationRecordService operationRecordService;
 
     @Override
-    public Member save(Member member) throws Exception {
+    public Member save(Member member) {
         if(StringUtils.isNotBlank(member.getId())) {
             Member old = repository.findOne(member.getId());
             member.setPassword(old.getPassword());
@@ -53,7 +53,7 @@ public class MemberServiceImpl extends AbstractCrudService<Member> implements Me
     }
 
     @Override
-    public Member findOneByCardNo(String cardNo) throws Exception {
+    public Member findOneByCardNo(String cardNo) {
         Map<String, String[]> param = new HashMap<>();
         param.put("cardNumber", new String[] {cardNo});
         List<MemberCard> memberCards = memberCardService.findAll(param);
@@ -64,7 +64,7 @@ public class MemberServiceImpl extends AbstractCrudService<Member> implements Me
     }
 
     @Override
-    public void fastIncreasePoint(String id, Integer point) throws Exception {
+    public void fastIncreasePoint(String id, Integer point) {
         Member member = findOne(id);
         if(member == null) {
             throw new BusinessException(String.format("会员id:[%s]不存在" , id));
@@ -84,7 +84,7 @@ public class MemberServiceImpl extends AbstractCrudService<Member> implements Me
      * @param member 会员
      * @param content 记录内容
      */
-    private void record(Member member, String content, OperationRecord.BusinessType businessType) throws Exception {
+    private void record(Member member, String content, OperationRecord.BusinessType businessType) {
         OperationRecord rechargeRecord = new OperationRecord();
         rechargeRecord.setMember(member);
         rechargeRecord.setBusinessType(businessType.name());
@@ -95,7 +95,7 @@ public class MemberServiceImpl extends AbstractCrudService<Member> implements Me
     }
 
     @Override
-    public void increaseBalance(String id, Double balance) throws Exception {
+    public void increaseBalance(String id, Double balance) {
         Member member = findOne(id);
         if(member == null) {
             throw new BusinessException(String.format("会员id:[%s]不存在" , id));
@@ -108,7 +108,7 @@ public class MemberServiceImpl extends AbstractCrudService<Member> implements Me
     }
 
     @Override
-    public void deductBalance(String memberId, Double amount) throws Exception {
+    public void deductBalance(String memberId, Double amount) {
         Member member = findOne(memberId);
         if(member == null) {
             throw new BusinessException(String.format("会员id:[%s]不存在" , memberId));
@@ -134,7 +134,7 @@ public class MemberServiceImpl extends AbstractCrudService<Member> implements Me
     }
 
     @Override
-    public void editPwd(Member member) throws Exception {
+    public void editPwd(Member member) {
         if(StringUtils.isBlank(member.getId())) {
             throw new BusinessException("会员id不能为空");
         }

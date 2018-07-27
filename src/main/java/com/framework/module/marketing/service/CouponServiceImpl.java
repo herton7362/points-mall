@@ -35,7 +35,7 @@ public class CouponServiceImpl extends AbstractCrudService<Coupon> implements Co
     }
 
     @Override
-    public Coupon save(Coupon coupon) throws Exception {
+    public Coupon save(Coupon coupon) {
         if(coupon.getClientId() == null) {
             coupon.setClientId(MemberThread.getInstance().getClientId());
         }
@@ -46,7 +46,7 @@ public class CouponServiceImpl extends AbstractCrudService<Coupon> implements Co
     }
 
     @Override
-    public List<Coupon> getUnClaimed(String memberId) throws Exception {
+    public List<Coupon> getUnClaimed(String memberId) {
         final Member member = memberService.findOne(memberId);
         final List<MemberCoupon> coupons = member.getCoupons();
         final String clientId = MemberThread.getInstance().getClientId();
@@ -75,7 +75,7 @@ public class CouponServiceImpl extends AbstractCrudService<Coupon> implements Co
     }
 
     @Override
-    public void validCouponUseAble(String couponId, Double amount) throws Exception {
+    public void validCouponUseAble(String couponId, Double amount) {
         Coupon coupon = couponRepository.findOne(couponId);
         String clientId = UserThread.getInstance().getClientId();
         if(!clientId.equals(coupon.getClientId())) {
@@ -90,7 +90,7 @@ public class CouponServiceImpl extends AbstractCrudService<Coupon> implements Co
     }
 
     @Override
-    public Double useCoupon(final String couponId, String memberId, Double amount) throws Exception {
+    public Double useCoupon(final String couponId, String memberId, Double amount) {
         validCouponUseAble(couponId, amount);
         Coupon coupon = couponRepository.findOne(couponId);
         Member member = memberService.findOne(memberId);
@@ -105,7 +105,7 @@ public class CouponServiceImpl extends AbstractCrudService<Coupon> implements Co
     }
 
     @Override
-    public void claim(String memberId, Coupon coupon) throws Exception {
+    public void claim(String memberId, Coupon coupon) {
         Member member = memberService.findOne(memberId);
         List<MemberCoupon> memberCoupons = member.getCoupons();
         MemberCoupon memberCoupon = new MemberCoupon();

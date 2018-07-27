@@ -8,17 +8,13 @@ import com.framework.module.member.domain.MemberCoupon;
 import com.framework.module.member.service.MemberService;
 import com.kratos.common.AbstractCrudController;
 import com.kratos.common.CrudService;
-import com.kratos.module.auth.domain.Module;
-import com.kratos.module.auth.service.OauthClientDetailsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -27,7 +23,6 @@ import java.util.List;
 @RequestMapping("/api/coupon")
 public class CouponController extends AbstractCrudController<Coupon> {
     private final CouponService couponService;
-    private final OauthClientDetailsService oauthClientDetailsService;
     private final MemberService memberService;
     @Override
     protected CrudService<Coupon> getService() {
@@ -39,7 +34,7 @@ public class CouponController extends AbstractCrudController<Coupon> {
      */
     @ApiOperation(value="保存")
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<Coupon> save(@RequestBody Coupon coupon) throws Exception {
+    public ResponseEntity<Coupon> save(@RequestBody Coupon coupon) {
         coupon = couponService.save(coupon);
         return new ResponseEntity<>(coupon, HttpStatus.OK);
     }
@@ -49,7 +44,7 @@ public class CouponController extends AbstractCrudController<Coupon> {
      */
     @ApiOperation(value="获取未获取的优惠券")
     @RequestMapping(value = "/unClaimed", method = RequestMethod.GET)
-    public ResponseEntity<List<Coupon>> getUnClaimed() throws Exception {
+    public ResponseEntity<List<Coupon>> getUnClaimed() {
         List<Coupon> coupons = couponService.getUnClaimed(MemberThread.getInstance().get().getId());
         return new ResponseEntity<>(coupons, HttpStatus.OK);
     }
@@ -59,7 +54,7 @@ public class CouponController extends AbstractCrudController<Coupon> {
      */
     @ApiOperation(value="获取当前用户优惠券数量")
     @RequestMapping(value = "/count/{memberId}", method = RequestMethod.GET)
-    public ResponseEntity<Integer> count(@PathVariable String memberId) throws Exception {
+    public ResponseEntity<Integer> count(@PathVariable String memberId) {
         Member member = memberService.findOne(memberId);
         Integer count = 0;
         for (MemberCoupon memberCoupon : member.getCoupons()) {
@@ -75,7 +70,7 @@ public class CouponController extends AbstractCrudController<Coupon> {
      */
     @ApiOperation(value="获取当前用户优惠券")
     @RequestMapping(value = "/member/{memberId}", method = RequestMethod.GET)
-    public ResponseEntity<List<MemberCoupon>> getMemberCoupons(@PathVariable String memberId) throws Exception {
+    public ResponseEntity<List<MemberCoupon>> getMemberCoupons(@PathVariable String memberId) {
         Member member = memberService.findOne(memberId);
         return new ResponseEntity<>(member.getCoupons(), HttpStatus.OK);
     }
@@ -85,7 +80,7 @@ public class CouponController extends AbstractCrudController<Coupon> {
      */
     @ApiOperation(value="领取优惠券")
     @RequestMapping(value = "/claim", method = RequestMethod.POST)
-    public ResponseEntity<?> claim(@RequestBody Coupon coupon) throws Exception {
+    public ResponseEntity<?> claim(@RequestBody Coupon coupon) {
         couponService.claim(MemberThread.getInstance().get().getId(), coupon);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -93,11 +88,9 @@ public class CouponController extends AbstractCrudController<Coupon> {
     @Autowired
     public CouponController(
             CouponService couponService,
-            OauthClientDetailsService oauthClientDetailsService,
             MemberService memberService
     ) {
         this.couponService = couponService;
-        this.oauthClientDetailsService = oauthClientDetailsService;
         this.memberService = memberService;
     }
 }

@@ -33,7 +33,7 @@ public class OperationRecordController extends AbstractCrudController<OperationR
         return operationRecordService;
     }
 
-    public ResponseEntity<?> searchPagedList(@ModelAttribute PageParam pageParam, HttpServletRequest request) throws Exception {
+    public ResponseEntity<?> searchPagedList(@ModelAttribute PageParam pageParam, HttpServletRequest request) {
         Map<String, String[]> param = request.getParameterMap();
         if(pageParam.isPageAble()) {
             PageResult<OperationRecordResult> page = operationRecordService.findAllTranslated(pageParam.getPageRequest(), param);

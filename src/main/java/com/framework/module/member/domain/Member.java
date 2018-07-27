@@ -56,8 +56,8 @@ public class Member extends BaseUser {
     @JsonIgnore
     private List<MemberCard> memberCards;
     @ApiModelProperty(value = "头像")
-    @ManyToOne
-    private Attachment headPhoto;
+    @Column(length = 36)
+    private String headPhotoId;
 
     public Member() {
         setUserType(BaseUser.UserType.MEMBER.name());
@@ -159,11 +159,11 @@ public class Member extends BaseUser {
         this.memberCards = memberCards;
     }
 
-    public Attachment getHeadPhoto() {
-        return headPhoto;
+    public String getHeadPhotoId() {
+        return headPhotoId;
     }
 
-    public void setHeadPhoto(Attachment headPhoto) {
-        this.headPhoto = headPhoto;
+    public void setHeadPhotoId(String headPhotoId) {
+        this.headPhotoId = headPhotoId;
     }
 }

@@ -24,7 +24,7 @@ public class ProductStandardServiceImpl extends AbstractCrudService<ProductStand
     }
 
     @Override
-    public ProductStandard save(ProductStandard productStandard) throws Exception {
+    public ProductStandard save(ProductStandard productStandard) {
         final ProductStandard newProductStandard = super.save(productStandard);
         List<ProductStandardItem> items = productStandard.getItems();
         items.forEach(productStandardItem -> {

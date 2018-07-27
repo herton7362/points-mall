@@ -19,7 +19,7 @@ public class MemberAddressServiceImpl extends AbstractCrudService<MemberAddress>
     }
 
     @Override
-    public MemberAddress save(MemberAddress memberAddress) throws Exception {
+    public MemberAddress save(MemberAddress memberAddress) {
         if(memberAddress.getMember() == null) {
             throw new BusinessException("会员不能为空");
         }

@@ -1,7 +1,6 @@
 package com.framework.module.product.web;
 
 import com.framework.module.product.domain.Product;
-import com.framework.module.product.domain.ProductCategory;
 import com.framework.module.product.service.ProductCategoryService;
 import com.framework.module.product.service.ProductService;
 import com.kratos.common.AbstractCrudController;
@@ -33,7 +32,7 @@ public class ProductController extends AbstractCrudController<Product> {
      */
     @ApiOperation(value="保存")
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<Product> save(@RequestBody Product product) throws Exception {
+    public ResponseEntity<Product> save(@RequestBody Product product) {
         if(product.getProductCategory() != null && StringUtils.isNotBlank(product.getProductCategory().getId())) {
             product.setProductCategory(productCategoryService.findOne(product.getProductCategory().getId()));
         } else {
@@ -48,7 +47,7 @@ public class ProductController extends AbstractCrudController<Product> {
      */
     @ApiOperation(value="查询总数")
     @RequestMapping(value = "/count", method = RequestMethod.GET)
-    public ResponseEntity<Long> count() throws Exception {
+    public ResponseEntity<Long> count() {
         return new ResponseEntity<>(productService.count(), HttpStatus.OK);
     }
 

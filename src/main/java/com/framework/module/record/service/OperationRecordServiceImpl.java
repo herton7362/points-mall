@@ -32,7 +32,7 @@ public class OperationRecordServiceImpl extends AbstractCrudService<OperationRec
     }
 
     @Override
-    public PageResult<OperationRecordResult> findAllTranslated(PageRequest pageRequest, Map<String, String[]> param) throws Exception {
+    public PageResult<OperationRecordResult> findAllTranslated(PageRequest pageRequest, Map<String, String[]> param) {
         PageResult<OperationRecord> page = findAll(pageRequest, param);
         PageResult<OperationRecordResult> pageResult = new PageResult<>();
         pageResult.setSize(page.getSize());
@@ -42,11 +42,11 @@ public class OperationRecordServiceImpl extends AbstractCrudService<OperationRec
     }
 
     @Override
-    public List<OperationRecordResult> findAllTranslated(Map<String, String[]> param) throws Exception {
+    public List<OperationRecordResult> findAllTranslated(Map<String, String[]> param) {
         return null;
     }
 
-    private List<OperationRecordResult> translateResults(List<OperationRecord> operationRecords) throws Exception {
+    private List<OperationRecordResult> translateResults(List<OperationRecord> operationRecords) {
         List<OperationRecordResult> operationRecordResults = new ArrayList<>();
         for (OperationRecord operationRecord : operationRecords) {
             operationRecordResults.add(this.translateResult(operationRecord));
@@ -54,11 +54,15 @@ public class OperationRecordServiceImpl extends AbstractCrudService<OperationRec
         return operationRecordResults;
     }
 
-    private OperationRecordResult translateResult(OperationRecord operationRecord) throws Exception {
+    private OperationRecordResult translateResult(OperationRecord operationRecord) {
         OperationRecordResult operationRecordResult = new OperationRecordResult();
         BeanUtils.copyProperties(operationRecord, operationRecordResult);
         if(StringUtils.isNotBlank(operationRecord.getClientId())) {
-            operationRecordResult.setClient(oauthClientDetailsService.findOneByClientId(operationRecord.getClientId()));
+            try {
+                operationRecordResult.setClient(oauthClientDetailsService.findOneByClientId(operationRecord.getClientId()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return operationRecordResult;
     }

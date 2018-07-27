@@ -15,28 +15,28 @@ public interface MemberService extends CrudService<Member> {
      * @param cardNo 会员卡号
      * @return {@link Member}
      */
-    Member findOneByCardNo(String cardNo) throws Exception;
+    Member findOneByCardNo(String cardNo);
 
     /**
      * 快速积分
      * @param id 会员id
      * @param point 增加的积分
      */
-    void fastIncreasePoint(String id, Integer point) throws Exception;
+    void fastIncreasePoint(String id, Integer point);
 
     /**
      * 增加余额
      * @param id 会员id
      * @param balance 增加的余额
      */
-    void increaseBalance(String id, Double balance) throws Exception;
+    void increaseBalance(String id, Double balance);
 
     /**
      * 储值扣费
      * @param memberId 会员id
      * @param amount 扣除的余额
      */
-    void deductBalance(String memberId, Double amount) throws Exception;
+    void deductBalance(String memberId, Double amount);
 
     /**
      * 查询总数
@@ -48,5 +48,5 @@ public interface MemberService extends CrudService<Member> {
      * 修改密码
      * @param member 会员参数
      */
-    void editPwd(Member member) throws Exception;
+    void editPwd(Member member);
 }
